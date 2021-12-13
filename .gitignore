@@ -1,2 +1,3 @@
 # don't want to duplicate this kind person's code https://github.com/dimpram/entropy-calculator/blob/master/entropy.py
-./python_implementation.py
+python_implementation.py
+passwordCritic

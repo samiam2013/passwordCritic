@@ -1,3 +1,11 @@
 # don't want to duplicate this kind person's code https://github.com/dimpram/entropy-calculator/blob/master/entropy.py
 python_implementation.py
+
+# the binary doesn't belong in github
 passwordCritic
+
+# the passwords file doesn't need to be stored here, just use wget_passwords.sh
+10-million-password-list-top-1000000.txt
+
+# nothing I put in the cache folder.
+.cache

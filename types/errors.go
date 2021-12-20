@@ -1,14 +1,6 @@
-package main
+package types
 
 import "fmt"
-
-// PassCandidate holds relevant information computed about the password
-type PassCandidate struct {
-	StringVal   string
-	cardinality int
-	H           float32
-	ErrorVal    error
-}
 
 type HomogeneityError struct {
 	Cardinality       int
@@ -29,3 +21,5 @@ func (t *TooCommonError) Error() string {
 	return fmt.Sprintf("password appears at least %d times in the 'too commmon' "+
 		"passwords list.", t.Occurrences)
 }
+
+// TODO hit match in bloom filter error

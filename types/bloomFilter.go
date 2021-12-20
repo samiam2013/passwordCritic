@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"fmt"
@@ -10,26 +10,27 @@ import (
 
 // this code adapted from https://codeburst.io/lets-implement-a-bloom-filter-in-go-b2da8a4b849f
 
-type Interface interface {
-	Add(item []byte)       // Adds the item into the Set
-	Test(item []byte) bool // Check if items is maybe in the Set
+type BFilter interface {
+	Add(item []byte) error          // Adds the item into the Set
+	Test(item []byte) (bool, error) // Check if items is maybe in the Set
 }
 
-// BloomFilter probabilistic data structure definition
+// BloomFilter probabilistic bloom filter struct
 type BloomFilter struct {
-	bitset []bool // The bloom-filter bitset
-	k      uint   // Number of hash values
-	n      uint   // Number of elements in the filter
-	//m      uint         // Size of the bloom filter bitset
-	hashFuncs []hash.Hash64 // The hash functions
+	bitset    []bool // The bloom-filter bitset
+	k         uint   // Number of hash values
+	n         uint   // Number of elements in the filter
+	hashFuncs []hash.Hash64
 }
 
-// Returns a new BloomFilter object,
+// force Bloomfilter Struct to fit the interface defined by BFilter
+var _ BFilter = &BloomFilter{}
+
+// Returns a new BloomFilter struct
 func NewBloom(size int) *BloomFilter {
 	return &BloomFilter{
-		bitset: make([]bool, size),
-		k:      3, // we have 3 hash functions for now
-		//m: size,
+		bitset:    make([]bool, size),
+		k:         3, // we have 3 hash functions (for now)
 		n:         uint(0),
 		hashFuncs: []hash.Hash64{murmur3.New64(), fnv.New64(), fnv.New64a()},
 	}
@@ -41,17 +42,13 @@ func (bf *BloomFilter) Add(item []byte) error {
 	if err != nil {
 		return fmt.Errorf("couldn't get hashes for adding item to bloom filter: %s", err.Error())
 	}
-	i := uint(0)
+
 	m := uint(len(bf.bitset))
-	for {
-		if i >= bf.k {
-			break
-		}
+	for i := uint(0); i < bf.k; i++ {
 		position := uint(hashes[i]) % m
 		bf.bitset[uint(position)] = true
-		i += 1
 	}
-	bf.n += 1
+	bf.n++
 	return nil
 }
 
@@ -77,21 +74,15 @@ func (bf *BloomFilter) Test(item []byte) (exists bool, failure error) {
 		failure = fmt.Errorf("failed hashing to test item in filter: %s", err.Error())
 		return
 	}
-	i := uint(0)
+
 	exists = true
-
 	m := uint(len(bf.bitset))
-	for {
-		if i >= bf.k {
-			break
-		}
-
-		position := uint(hashes[i]) % m // bf.m
+	for i := uint(0); i < bf.k; i++ {
+		position := uint(hashes[i]) % m
 		if !bf.bitset[uint(position)] {
 			exists = false
 			break
 		}
-		i += 1
 	}
 	return
 }

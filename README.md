@@ -1,12 +1,23 @@
-# passwordCritic
-a Go library for critiquing your selection of passwords
+# Password Critic
+###  github.com/samiam2013/passwordCritic
+a Go module for critiquing your selection of passwords
+
+first using the entropy of your chosen password, then a set of bloom filters for common passwords. 
+
+if the password is bad, the code will explain why.
 
 ## the current plan
 
 check the entropy of the password, stopping things like "12341234"
 
-if it passes an entropy check, look it up in a ?markov-chain generated list of combinations of the most common passwords
+if it passes an entropy check, look for it in a bloom filter of the top 10,000,000 most common passwords, 
 
-if it's not anywhere in the list, allow  the user to continue,
+if it's found in the 10MM list, look it up in a 10k and then 100 item bloom filter, 
 
-else give an exact explanation to the user as to why they shold not choose that password
+if you find it in a 10k list from that 10MM, you get back an error
+
+## TODO:
+ * test frequency of false positives for a given BloomFilter.bitSet size
+ * benchmark algorithms used by bloom filter for hashing 
+ * serialize the filter to a file included in the library so the filter does not have to be computed from a list when included as a go module
+ * look up the most ubiquitous way to get a list of things from the internet as a go module, ?maybe consider forking the list and using git from inside go for updates?

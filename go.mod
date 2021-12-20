@@ -1,4 +1,4 @@
-module github.com/samiam2013/passwordCritic
+module github.com/samiam2013/passwordcritic
 
 go 1.17
 

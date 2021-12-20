@@ -1,8 +1,16 @@
-package main
+package passwordcritic
 
 import (
 	"math"
 )
+
+// PassCandidate holds relevant information computed about the password
+type PassCandidate struct {
+	StringVal   string
+	cardinality int
+	H           float32
+	ErrorVal    error
+}
 
 // Load sets the values for the candidate password (entropy, error info)
 func (p *PassCandidate) Load(s string) {

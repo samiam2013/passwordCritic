@@ -1,4 +1,4 @@
-package main
+package passwordcritic
 
 import (
 	"testing"
@@ -15,7 +15,12 @@ func TestEntropy(t *testing.T) {
 	}
 
 	// create an instance for use of .Entropy()
-	pwCand := PassCandidate{}
+	pwCand := PassCandidate{
+		StringVal:   "",
+		cardinality: 0,
+		H:           0.0,
+		ErrorVal:    nil,
+	}
 
 	for pwCase, hExpected := range cases {
 		pwCand.Load(pwCase)

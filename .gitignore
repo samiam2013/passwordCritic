@@ -9,3 +9,6 @@ passwordCritic
 
 # nothing I put in the cache folder.
 .cache
+
+# not the binary in passchk either
+passchk/passchk

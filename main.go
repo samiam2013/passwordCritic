@@ -1,21 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
-func main() {
-	inputText := "rthedfff" //"correcthorsebatterystaple"
+// PassCandidate holds relevant information computed about the password
+type PassCandidate struct {
+	StringVal   string
+	cardinality int
+	H           float32
+	ErrorVal    error
+}
 
-	occurences := charOccurences(inputText)
-	fmt.Println("occurrences", occurences)
+// Load sets the values for the candidate password (entropy, error info)
+func (p *PassCandidate) Load(s string) {
+	p.StringVal = s
+	p.H = p.Entropy()
+}
 
-	probabilities := charProbabilites(inputText, occurences)
-	fmt.Println("probabilities", probabilities)
-
-	entropy := entropy(probabilities)
-	fmt.Println("entropy", entropy)
+/* Entropy takes in a string and gives you a float32 entropy
+ * value based on variety of characters */
+func (p *PassCandidate) Entropy() float32 {
+	occurences := charOccurences(p.StringVal)
+	p.cardinality = len(occurences)
+	probabilities := charProbabilites(p.StringVal, occurences)
+	return entropy(probabilities)
 }
 
 // Calculates the # occurrences of each character

@@ -18,8 +18,7 @@ func (p *PassCandidate) Load(s string) {
 	p.H = p.Entropy()
 }
 
-/* Entropy takes in a string and gives you a float32 entropy
- * value based on variety of characters */
+// Entropy takes in a string and gives you a float32 entropy (w/ variety/freq of chars)
 func (p *PassCandidate) Entropy() float32 {
 	occurrences := charOccurrences(p.StringVal)
 	p.cardinality = len(occurrences)

@@ -10,7 +10,7 @@ import (
 
 // this code adapted from https://codeburst.io/lets-implement-a-bloom-filter-in-go-b2da8a4b849f
 
-// BFilterenforces what a Bloom Filter is (as function prototypes)
+// BFilter enforces what a Bloom Filter is (as function prototypes)
 type BFilter interface {
 	Add(item []byte) error          // Adds the item into the Set
 	Test(item []byte) (bool, error) // Check if items is maybe in the Set

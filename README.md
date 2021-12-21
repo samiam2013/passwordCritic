@@ -1,4 +1,6 @@
 # Password Critic [![codecov](https://codecov.io/gh/samiam2013/passwordCritic/branch/main/graph/badge.svg?token=GDEPYIjlBw)](https://codecov.io/gh/samiam2013/passwordCritic) [![Build Status](https://app.travis-ci.com/samiam2013/passwordCritic.svg?branch=main)](https://app.travis-ci.com/samiam2013/passwordCritic) [![Go Report Card](https://goreportcard.com/badge/github.com/samiam2013/passwordCritic)](https://goreportcard.com/report/github.com/samiam2013/passwordCritic)
+
+
 ###  github.com/samiam2013/passwordCritic
 a Go module for critiquing your selection of passwords
 

@@ -21,31 +21,31 @@ func (p *PassCandidate) Load(s string) {
 /* Entropy takes in a string and gives you a float32 entropy
  * value based on variety of characters */
 func (p *PassCandidate) Entropy() float32 {
-	occurences := charOccurences(p.StringVal)
-	p.cardinality = len(occurences)
-	probabilities := charProbabilites(p.StringVal, occurences)
+	occurrences := charOccurrences(p.StringVal)
+	p.cardinality = len(occurrences)
+	probabilities := charProbabilites(p.StringVal, occurrences)
 	return entropy(probabilities)
 }
 
-// charOccurences maps the frequency of characters for the entropy calculation later
-func charOccurences(text string) map[rune]int {
-	occurences := map[rune]int{}
+// charOccurrences maps the frequency of characters for the entropy calculation later
+func charOccurrences(text string) map[rune]int {
+	occurrences := map[rune]int{}
 	for _, char := range text {
-		if _, ok := occurences[char]; !ok {
-			occurences[char] = 1
+		if _, ok := occurrences[char]; !ok {
+			occurrences[char] = 1
 		} else {
-			occurences[char]++
+			occurrences[char]++
 		}
 	}
-	return occurences
+	return occurrences
 }
 
 // Calculate the probability of occurrence of each character
-func charProbabilites(text string, occurences map[rune]int) map[rune]float32 {
+func charProbabilites(text string, occurrences map[rune]int) map[rune]float32 {
 	textLength := float32(len(text))
 	probabilities := map[rune]float32{}
 	for _, char := range text {
-		probabilities[char] = float32(occurences[char]) / textLength
+		probabilities[char] = float32(occurrences[char]) / textLength
 	}
 	return probabilities
 }

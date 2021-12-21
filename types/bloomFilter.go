@@ -10,6 +10,7 @@ import (
 
 // this code adapted from https://codeburst.io/lets-implement-a-bloom-filter-in-go-b2da8a4b849f
 
+// BFilterenforces what a Bloom Filter is (as function prototypes)
 type BFilter interface {
 	Add(item []byte) error          // Adds the item into the Set
 	Test(item []byte) (bool, error) // Check if items is maybe in the Set
@@ -26,7 +27,7 @@ type BloomFilter struct {
 // force Bloomfilter Struct to fit the interface defined by BFilter
 var _ BFilter = &BloomFilter{}
 
-// Returns a new BloomFilter struct
+// NewBloom returns a new BloomFilter struct with default values
 func NewBloom(size int) *BloomFilter {
 	return &BloomFilter{
 		bitset:    make([]bool, size),
@@ -36,7 +37,7 @@ func NewBloom(size int) *BloomFilter {
 	}
 }
 
-// Adds the item into the bloom filter set by hashing in over the hash functions
+// Add the item into the bloom filter set by hashing in over the hash functions
 func (bf *BloomFilter) Add(item []byte) error {
 	hashes, err := bf.hashValues(item)
 	if err != nil {
@@ -67,7 +68,7 @@ func (bf *BloomFilter) hashValues(item []byte) ([]uint64, error) {
 	return result, nil
 }
 
-// Test if the item into the bloom filter is set by hashing in over // the hash functions
+// Test if the item hash in the bloom filter is set by iterating over the hash functions
 func (bf *BloomFilter) Test(item []byte) (exists bool, failure error) {
 	hashes, err := bf.hashValues(item)
 	if err != nil {

@@ -2,6 +2,8 @@ package types
 
 import "fmt"
 
+/* HomogeneityError creates a switchable type of error for problems
+ * relating to the entropy of the password */
 type HomogeneityError struct {
 	Cardinality       int
 	LowestProbability float32
@@ -13,6 +15,8 @@ func (h *HomogeneityError) Error() string {
 		h.Cardinality, h.LowestProbability)
 }
 
+/* TooCommonError creates a switchable type of error for problems
+ * caused by a hit in the bloom filter for common passwords */
 type TooCommonError struct {
 	Occurrences int
 }
@@ -22,4 +26,5 @@ func (t *TooCommonError) Error() string {
 		"passwords list.", t.Occurrences)
 }
 
-// TODO hit match in bloom filter error
+// tie these types to the error interface
+var _, _ error = &HomogeneityError{}, &TooCommonError{}

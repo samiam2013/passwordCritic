@@ -8,7 +8,7 @@ passwordCritic
 10-million-password-list-top-1000000.txt
 
 # nothing I put in the cache folder.
-.cache
+cache
 
 # not the binary in passchk either
 passchk/passchk

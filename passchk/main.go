@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -27,38 +28,12 @@ func main() {
 	flag.Parse()
 
 	if len(*pwCandPtr) == 0 {
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		fmt.Println(scanner.Text())
-		if scanner.Err() != nil {
-			log.Fatal("length of given pass was zero and scanner failed: ",
-				scanner.Err().Error())
-		}
+		*pwCandPtr = getStdIn()
 	}
 
-	// load the password and check the Entropy
-	candidate := critic.PassCandidate{}
-	candidate.StringVal = *pwCandPtr
-	h, err := candidate.Entropy()
-	fmt.Println("Entropy of the password candidate: ", h)
+	entropyCandidate, err := checkEntropy(pwCandPtr)
 	if err != nil {
-		if _, ok := err.(*types.HomogeneityError); !ok {
-			log.Fatalf("non-homogeneity error encounter checking entropy"+
-				" of candidate: %s", err.Error())
-		}
-		hmgError := err.(*types.HomogeneityError)
-		if hmgError.LowestProbability > minLeastCommonCharProb {
-			// give an error msg about the least frequent character being too common
-			fmt.Printf("least frequent character is too common: %f (percentage 0 to 1)\n",
-				hmgError.LowestProbability)
-		} else if hmgError.Cardinality < minCandidateCardinality {
-			// give an error msg about the repetition of characters
-			fmt.Printf("variety of characters too low: %d (expect > %d)\n",
-				hmgError.Cardinality, minCandidateCardinality)
-		} else {
-			// give a default case error msg
-			fmt.Printf("low entropy for password: mix of low variety and length\n")
-		}
+		log.Println(err)
 	}
 	// check if candidate occurs in the 10,000 most common filter
 	// if it is error out saying it's far too common
@@ -67,6 +42,51 @@ func main() {
 	// if it is error out saying it's a common password, but not the most common
 
 	// give the user back information about the password
-	fmt.Printf("%+v\n", candidate)
+	fmt.Printf("%+v\n", entropyCandidate)
 
+}
+
+func getStdIn() string {
+	output := []rune{}
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		input, _, err := reader.ReadRune()
+		if err != nil && err == io.EOF {
+			break
+		}
+		output = append(output, input)
+	}
+	return string(output)
+}
+
+func checkEntropy(pwCandPtr *string) (candidate critic.PassCandidate, err error) {
+	// load the password and check the Entropy
+	candidate = critic.PassCandidate{}
+	candidate.StringVal = *pwCandPtr
+	h, err := candidate.Entropy()
+	fmt.Println("Entropy of the password candidate: ", h)
+	if err != nil {
+		if _, ok := err.(*types.HomogeneityError); !ok {
+			err = fmt.Errorf("non-homogeneity error encounter checking entropy"+
+				" of candidate: %s", err.Error())
+			return
+		}
+		hmgError := err.(*types.HomogeneityError)
+		if hmgError.LowestProbability > minLeastCommonCharProb {
+			// give an error msg about the least frequent character being too common
+			err = fmt.Errorf("high repetition of characters: minimum %f (percentage 0 to 1)\n",
+				hmgError.LowestProbability)
+			return
+		} else if hmgError.Cardinality < minCandidateCardinality {
+			// give an error msg about the repetition of characters
+			err = fmt.Errorf("low variety of characters: %d (expect > %d)\n",
+				hmgError.Cardinality, minCandidateCardinality)
+			return
+		} else {
+			// give a default case error msg
+			err = fmt.Errorf("low entropy for password: mix of low variety and length\n")
+			return
+		}
+	}
+	return
 }

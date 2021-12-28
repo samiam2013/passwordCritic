@@ -20,7 +20,7 @@ func TestEntropy(t *testing.T) {
 	// create an instance for use of .Entropy()
 	pwCand := PassCandidate{
 		StringVal:   "",
-		cardinality: 0,
+		Cardinality: 0,
 		H:           0.0,
 	}
 

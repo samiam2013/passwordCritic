@@ -9,21 +9,21 @@ import (
 // PassCandidate holds relevant information computed about the password
 type PassCandidate struct {
 	StringVal   string
-	cardinality int
+	Cardinality int
 	H           float32
 }
 
 // Entropy returns a float32 calculated using variety and frequency of characters
 func (p *PassCandidate) Entropy() (float32, error) {
 	occurrences := charOccurrences(p.StringVal)
-	p.cardinality = len(occurrences)
+	p.Cardinality = len(occurrences)
 	probabilities := charProbabilites(p.StringVal, occurrences)
 	h := entropy(probabilities)
 	p.H = h
 	if h < 4.0 {
 		return h,
 			&types.HomogeneityError{
-				Cardinality:       p.cardinality,
+				Cardinality:       p.Cardinality,
 				LowestProbability: minMapRuneFloat32(probabilities),
 			}
 	}

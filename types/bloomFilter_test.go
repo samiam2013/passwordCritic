@@ -10,22 +10,29 @@ import (
 func TestBloomFilter(t *testing.T) {
 	assert := require.New(t)
 	bf := NewBloom(1024)
-	bf.Add([]byte("hello"))
-	bf.Add([]byte("world"))
-	bf.Add([]byte("sir"))
-	bf.Add([]byte("madam"))
-	bf.Add([]byte("io"))
+	inputs := []string{"hello", "world", "hi", "fizz", "buzz", "foo", "bar"}
+	controls := []string{"shalom", "gaia", "konnichiwa", "kuohua", "zumbido"}
 
-	cases := map[string]bool{
-		"hello": true,
-		"world": true,
-		"hi":    false,
-	}
-	for candidate, expected := range cases {
-		gotResult, err := bf.Test([]byte(candidate))
+	for _, input := range inputs {
+		err := bf.Add([]byte(input))
 		if err != nil {
-			t.Errorf("failed to test candidate '%s' against filter: %s", candidate, err.Error())
+			t.Error(err)
 		}
-		assert.Equal(gotResult, expected)
+	}
+
+	for _, input := range inputs {
+		gotResult, err := bf.Test([]byte(input))
+		if err != nil {
+			t.Errorf("failed to test candidate '%s' against filter: %s", input, err.Error())
+		}
+		assert.True(gotResult)
+	}
+
+	for _, control := range controls {
+		gotResult, err := bf.Test([]byte(control))
+		if err != nil {
+			t.Error(err)
+		}
+		assert.False(gotResult)
 	}
 }

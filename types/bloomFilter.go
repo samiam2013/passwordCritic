@@ -8,7 +8,8 @@ import (
 	"github.com/spaolacci/murmur3"
 )
 
-// this code adapted from https://codeburst.io/lets-implement-a-bloom-filter-in-go-b2da8a4b849f
+// this code adapted from
+// https://codeburst.io/lets-implement-a-bloom-filter-in-go-b2da8a4b849f
 
 // BFilter enforces what a Bloom Filter is (as function prototypes)
 type BFilter interface {

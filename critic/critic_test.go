@@ -1,10 +1,8 @@
 package critic
 
 import (
-	"reflect"
+	"strings"
 	"testing"
-
-	"github.com/samiam2013/passwordcritic/types"
 )
 
 // TestEntropy _
@@ -27,16 +25,20 @@ func TestEntropy(t *testing.T) {
 	for pwCase, hExpected := range cases {
 		pwCand.StringVal = pwCase
 		entropy, err := pwCand.Entropy()
-		if err != nil && entropy >= MinEntropy {
-			t.Errorf("case '%s' expected no error, got '%s'", pwCase, err.Error())
-		} else if entropy < MinEntropy {
-			if reflect.TypeOf(err) != reflect.TypeOf(&types.HomogeneityError{}) {
-				t.Errorf("case '%s' entropy < 4.0 (%f), error type '%s'", pwCase, entropy,
-					reflect.TypeOf(err))
+		if err != nil {
+			if len(pwCase) < MinLength {
+				if !strings.HasPrefix(err.Error(), "password too short") {
+					t.Errorf("case '%s' expected password too short, got '%s'", pwCase, err.Error())
+				}
+			} else if !strings.HasPrefix(err.Error(), "password is homogenous") {
+				t.Errorf("case '%s' expected homogeneity error with prefix, got '%s'",
+					pwCase, err.Error())
+			} else if entropy >= MinEntropy {
+				t.Errorf("case '%s' expected no error, got '%s'", pwCase, err.Error())
 			}
 		}
 		if entropy != hExpected {
-			t.Errorf("case '%s' expected entropy %+v; got %+v", pwCase, entropy, hExpected)
+			t.Errorf("case '%s' expected entropy %+v; got %+v", pwCase, hExpected, entropy)
 		}
 	}
 }

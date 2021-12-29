@@ -1,7 +1,9 @@
 package critic
 
 import (
+	"errors"
 	"math"
+	"strconv"
 
 	"github.com/samiam2013/passwordcritic/types"
 )
@@ -16,8 +18,16 @@ type PassCandidate struct {
 // MinEntropy defines the lowest value for throwing a Homogeneity Error
 const MinEntropy = 3.0
 
+// MinLength defines the shortest password allowed
+const MinLength = 8
+
 // Entropy returns a float32 calculated using variety and frequency of characters
 func (p *PassCandidate) Entropy() (float32, error) {
+	if len(p.StringVal) < MinLength {
+		err := errors.New("password too short, minimum" +
+			strconv.Itoa(MinLength) + "characters")
+		return 0.0, err
+	}
 	occurrences := charOccurrences(p.StringVal)
 	p.Cardinality = len(occurrences)
 	probabilities := charProbabilites(p.StringVal, occurrences)

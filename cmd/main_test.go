@@ -2,13 +2,12 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/samiam2013/passwordcritic/critic"
-	"github.com/samiam2013/passwordcritic/types"
 )
 
 // TODO : evaluate whether this mostly-generated code meets needs
@@ -23,7 +22,7 @@ func Test_checkEntropy(t *testing.T) {
 		args          args
 		wantCandidate critic.PassCandidate
 		wantErr       bool
-		wantErrType   interface{} // ugh.
+		wantErrPrefix string
 	}{
 		// TODO: Add test cases.
 		{
@@ -34,8 +33,8 @@ func Test_checkEntropy(t *testing.T) {
 				Cardinality: 11,
 				H:           3.375,
 			},
-			wantErr:     false, //flipped
-			wantErrType: nil,   //&types.HomogeneityError{},
+			wantErr:       false,
+			wantErrPrefix: "", //&types.HomogeneityError{},
 		},
 		{
 			name: "entropy too low",
@@ -45,8 +44,8 @@ func Test_checkEntropy(t *testing.T) {
 				Cardinality: 7,
 				H:           2.75,
 			},
-			wantErr:     true,
-			wantErrType: &types.HomogeneityError{},
+			wantErr:       true,
+			wantErrPrefix: "low entropy",
 		},
 		{
 			name: "repitition too high",
@@ -56,8 +55,8 @@ func Test_checkEntropy(t *testing.T) {
 				Cardinality: 5,
 				H:           2.321928,
 			},
-			wantErr:     true,
-			wantErrType: &types.HomogeneityError{},
+			wantErr:       true,
+			wantErrPrefix: "low variety", //"high repitition",
 		},
 		{
 			name: "h too low & repitition too high",
@@ -67,8 +66,8 @@ func Test_checkEntropy(t *testing.T) {
 				Cardinality: 6,
 				H:           2.5,
 			},
-			wantErr:     true,
-			wantErrType: &types.HomogeneityError{},
+			wantErr:       true,
+			wantErrPrefix: "low entropy",
 		},
 		{
 			name: "good password",
@@ -78,8 +77,8 @@ func Test_checkEntropy(t *testing.T) {
 				Cardinality: 21,
 				H:           4.184778,
 			},
-			wantErr:     false,
-			wantErrType: nil,
+			wantErr:       false,
+			wantErrPrefix: "high repititon",
 		},
 	}
 
@@ -87,11 +86,11 @@ func Test_checkEntropy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotCandidate, err := checkEntropy(tt.args.pwCandPtr)
 			if (err != nil) != tt.wantErr {
-				if tt.wantErrType != nil && errors.As(err, tt.wantErrType) {
-					t.Errorf("got unexpected error type: wanted '%s'; got type '%s';",
-						reflect.TypeOf(tt.wantErrType), reflect.TypeOf(err))
-				}
 				t.Errorf("checkEntropy() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr && !strings.HasPrefix(err.Error(), tt.wantErrPrefix) {
+				t.Errorf("got unexpected error prefix: wanted '%s'; got type '%s';",
+					tt.wantErrPrefix, err.Error())
 			}
 			if !reflect.DeepEqual(gotCandidate, tt.wantCandidate) {
 				t.Errorf("checkEntropy() = %v, want %v", gotCandidate, tt.wantCandidate)

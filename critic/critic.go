@@ -13,6 +13,9 @@ type PassCandidate struct {
 	H           float32
 }
 
+// MinEntropy defines the lowest value for throwing a Homogeneity Error
+const MinEntropy = 3.0
+
 // Entropy returns a float32 calculated using variety and frequency of characters
 func (p *PassCandidate) Entropy() (float32, error) {
 	occurrences := charOccurrences(p.StringVal)
@@ -20,7 +23,7 @@ func (p *PassCandidate) Entropy() (float32, error) {
 	probabilities := charProbabilites(p.StringVal, occurrences)
 	h := entropy(probabilities)
 	p.H = h
-	if h < 4.0 {
+	if h < MinEntropy {
 		return h,
 			&types.HomogeneityError{
 				Cardinality:       p.Cardinality,

@@ -14,8 +14,8 @@ import (
 
 // maybe add (-v|--verbose) or (-q|--quiet) flag?
 
-const minLeastCommonCharProb = 0.1
-const minCandidateCardinality = 8
+const maxLowestCharProb = 0.2
+const minCandidateCardinality = 6 // e.g. 8 char pass with 2 repititions
 
 func main() {
 	// check for (-r|--rebuild-filter) and rebuild the filter if needed
@@ -28,7 +28,7 @@ func main() {
 	flag.Parse()
 
 	if len(*pwCandPtr) == 0 {
-		*pwCandPtr = getStdIn()
+		*pwCandPtr = getStdIn(os.Stdin)
 	}
 
 	entropyCandidate, err := checkEntropy(pwCandPtr)
@@ -46,9 +46,9 @@ func main() {
 
 }
 
-func getStdIn() string {
+func getStdIn(stdin io.Reader) string {
 	output := []rune{}
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(stdin)
 	for {
 		input, _, err := reader.ReadRune()
 		if err != nil && err == io.EOF {
@@ -72,19 +72,19 @@ func checkEntropy(pwCandPtr *string) (candidate critic.PassCandidate, err error)
 			return
 		}
 		hmgError := err.(*types.HomogeneityError)
-		if hmgError.LowestProbability > minLeastCommonCharProb {
+		if hmgError.LowestProbability > maxLowestCharProb {
 			// give an error msg about the least frequent character being too common
-			err = fmt.Errorf("high repetition of characters: minimum %f (percentage 0 to 1)\n",
+			err = fmt.Errorf("high repetition of characters: minimum %f (percentage 0 to 1)",
 				hmgError.LowestProbability)
 			return
 		} else if hmgError.Cardinality < minCandidateCardinality {
 			// give an error msg about the repetition of characters
-			err = fmt.Errorf("low variety of characters: %d (expect > %d)\n",
+			err = fmt.Errorf("low variety of characters: %d (expect > %d)",
 				hmgError.Cardinality, minCandidateCardinality)
 			return
 		} else {
 			// give a default case error msg
-			err = fmt.Errorf("low entropy for password: mix of low variety and length\n")
+			err = fmt.Errorf("low entropy for password: mix of low variety and length")
 			return
 		}
 	}

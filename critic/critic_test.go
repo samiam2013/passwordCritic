@@ -27,9 +27,9 @@ func TestEntropy(t *testing.T) {
 	for pwCase, hExpected := range cases {
 		pwCand.StringVal = pwCase
 		entropy, err := pwCand.Entropy()
-		if err != nil && entropy >= 4.0 {
+		if err != nil && entropy >= MinEntropy {
 			t.Errorf("case '%s' expected no error, got '%s'", pwCase, err.Error())
-		} else if entropy < 4.0 {
+		} else if entropy < MinEntropy {
 			if reflect.TypeOf(err) != reflect.TypeOf(&types.HomogeneityError{}) {
 				t.Errorf("case '%s' entropy < 4.0 (%f), error type '%s'", pwCase, entropy,
 					reflect.TypeOf(err))

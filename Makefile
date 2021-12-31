@@ -1,6 +1,8 @@
 rebuild: 
-	wget "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-Credentials/10-million-password-list-top-1000000.txt" \
-		-o ./cache/top_10MM_passwords.txt;
+	cd ./cache/; \
+	wget "https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-1000000.txt"; \
+	wget "https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-100000.txt"; \
+	wget "https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-1000.txt";
 
 build: 
 	go build ./passchk/main.go

@@ -25,13 +25,18 @@ type BloomFilter struct {
 	hashFuncs []hash.Hash64
 }
 
+// GetBitSet needed for testing?
+func (b *BloomFilter) GetBitset() []bool {
+	return b.bitset
+}
+
 // force Bloomfilter Struct to fit the interface defined by BFilter
 var _ BFilter = &BloomFilter{}
 
-// NewBloom returns a new BloomFilter struct with default values
-func NewBloom(size int) *BloomFilter {
+// NewBloom returns a new BloomFilter struct with n bits and default hash funcs
+func NewBloom(n int) *BloomFilter {
 	return &BloomFilter{
-		bitset:    make([]bool, size),
+		bitset:    make([]bool, n),
 		k:         3, // we have 3 hash functions (for now)
 		n:         uint(0),
 		hashFuncs: []hash.Hash64{murmur3.New64(), fnv.New64(), fnv.New64a()},

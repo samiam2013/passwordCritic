@@ -5,6 +5,7 @@ go:
   - tip
 
 before_install:
+  - make rebuild
   - go get -t -v ./...
 
 script:

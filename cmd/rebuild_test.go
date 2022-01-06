@@ -2,9 +2,12 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/samiam2013/passwordcritic/types"
@@ -56,24 +59,39 @@ func TestRebuildFilters(t *testing.T) {
 	tests := []struct {
 		name       string
 		nFilters   int
-		filterLens []int // length instead of []types.BloomFilter
+		filterLens map[int]int // length instead of []types.BloomFilter
+		clearCache bool        // whether or not cache should be cleared before rebuild to create error cases
 		wantErr    bool
 	}{
 		{
 			name:     "happy path",
 			nFilters: 4,
-			filterLens: []int{
-				12364,
-				123641,
-				1236416,
-				12364167,
+			filterLens: map[int]int{
+				1_000_000: 12364167,
+				100_000:   1236416,
+				10_000:    123641,
+				1000:      12364,
 			},
-			wantErr: false,
+			clearCache: false,
+			wantErr:    false,
 		},
-		// TODO failing cases
+		{
+			name:       "sad path",
+			nFilters:   0,
+			filterLens: map[int]int{},
+			clearCache: true,
+			wantErr:    true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.clearCache {
+				err = filepath.Walk(CacheFolderPath, deletePWFiles)
+				if err != nil {
+					t.Fatalf(err.Error())
+				}
+			}
+
 			gotten, err := RebuildFilters()
 			nFitlersGot := len(gotten)
 			if (err != nil) != tt.wantErr {
@@ -86,6 +104,26 @@ func TestRebuildFilters(t *testing.T) {
 			for i, filter := range gotten {
 				assert.Equal(t, len(filter.GetBitset()), tt.filterLens[i])
 			}
+
+			if tt.clearCache {
+				if _, err = DownloadLists(); err != nil {
+					t.Fatalf("error rebuilding cache after clearing for test: %s", err.Error())
+				}
+			}
 		})
 	}
+}
+
+func deletePWFiles(path string, f os.FileInfo, err error) (e error) {
+	if err != nil {
+		return fmt.Errorf("error at call time (err parameter) to deletePWFiles: %s", err.Error())
+	}
+	if strings.HasSuffix(filepath.Base(path), "00.txt") {
+		err := os.Remove(path)
+		if err != nil {
+			e = err
+			return
+		}
+	}
+	return nil
 }

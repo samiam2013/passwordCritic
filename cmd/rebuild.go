@@ -9,14 +9,17 @@ import (
 	"github.com/samiam2013/passwordcritic/types"
 )
 
-func RebuildFilters() ([]types.BloomFilter, error) {
+// CacheFolderPath keeps a single reference to password list directory
+const CacheFolderPath = "../cache"
+
+func RebuildFilters() (map[int]types.BloomFilter, error) {
 	files := map[int]string{
-		1_000:     "../cache/10-million-password-list-top-1000.txt",
-		10_000:    "../cache/10-million-password-list-top-10000.txt",
-		100_000:   "../cache/10-million-password-list-top-100000.txt",
-		1_000_000: "../cache/10-million-password-list-top-1000000.txt",
+		1_000:     CacheFolderPath + "/1000.txt",
+		10_000:    CacheFolderPath + "/10000.txt",
+		100_000:   CacheFolderPath + "/100000.txt",
+		1_000_000: CacheFolderPath + "/1000000.txt",
 	}
-	filters := make([]types.BloomFilter, 0)
+	filters := make(map[int]types.BloomFilter)
 	for count, filepath := range files {
 		bitsNeeded := int(float32(count) * 12.364167) // only works for 3 hash functions
 
@@ -31,7 +34,7 @@ func RebuildFilters() ([]types.BloomFilter, error) {
 			return nil, fmt.Errorf("error building filter for file '%s': %s",
 				fh.Name(), err.Error())
 		}
-		filters = append(filters, *newFilter)
+		filters[count] = *newFilter
 	}
 
 	return filters, nil

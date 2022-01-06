@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/samiam2013/passwordcritic/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +21,7 @@ func Test_buildFilter(t *testing.T) {
 	tests := []struct {
 		name        string
 		args        args
-		wantBFilter *types.BloomFilter
+		wantBFilter *BloomFilter
 		wantErr     bool
 	}{
 		{
@@ -31,7 +30,7 @@ func Test_buildFilter(t *testing.T) {
 				bits:     123,
 				filepath: bytes.NewReader([]byte("")),
 			},
-			wantBFilter: types.NewBloom(123),
+			wantBFilter: NewBloom(123),
 			wantErr:     false,
 		},
 		// TODO failing cases

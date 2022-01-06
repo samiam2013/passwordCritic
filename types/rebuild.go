@@ -1,25 +1,23 @@
-package main
+package types
 
 import (
 	"bufio"
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/samiam2013/passwordcritic/types"
 )
 
 // CacheFolderPath keeps a single reference to password list directory
 const CacheFolderPath = "../cache"
 
-func RebuildFilters() (map[int]types.BloomFilter, error) {
+func RebuildFilters() (map[int]BloomFilter, error) {
 	files := map[int]string{
 		1_000:     CacheFolderPath + "/1000.txt",
 		10_000:    CacheFolderPath + "/10000.txt",
 		100_000:   CacheFolderPath + "/100000.txt",
 		1_000_000: CacheFolderPath + "/1000000.txt",
 	}
-	filters := make(map[int]types.BloomFilter)
+	filters := make(map[int]BloomFilter)
 	for count, filepath := range files {
 		bitsNeeded := int(float32(count) * 12.364167) // only works for 3 hash functions
 
@@ -40,9 +38,9 @@ func RebuildFilters() (map[int]types.BloomFilter, error) {
 	return filters, nil
 }
 
-func buildFilter(bits int, fh io.Reader) (bFilter *types.BloomFilter, err error) {
+func buildFilter(bits int, fh io.Reader) (bFilter *BloomFilter, err error) {
 	err = nil
-	bFilter = types.NewBloom(bits)
+	bFilter = NewBloom(bits)
 
 	scanner := bufio.NewScanner(fh)
 	for scanner.Scan() {

@@ -10,9 +10,6 @@ import (
 	"github.com/samiam2013/passwordcritic/critic"
 )
 
-// TODO : evaluate whether this mostly-generated code meets needs
-
-// Test_checkEntropy _
 func Test_checkEntropy(t *testing.T) {
 	type args struct {
 		pwCandPtr *string
@@ -34,7 +31,7 @@ func Test_checkEntropy(t *testing.T) {
 				H:           3.375,
 			},
 			wantErr:       false,
-			wantErrPrefix: "", //&types.HomogeneityError{},
+			wantErrPrefix: "",
 		},
 		{
 			name: "entropy too low",
@@ -48,28 +45,6 @@ func Test_checkEntropy(t *testing.T) {
 			wantErrPrefix: "low entropy",
 		},
 		{
-			name: "repitition too high",
-			args: args{pwCandPtr: strPtr("ppsswwrrdd")},
-			wantCandidate: critic.PassCandidate{
-				StringVal:   "ppsswwrrdd",
-				Cardinality: 5,
-				H:           2.321928,
-			},
-			wantErr:       true,
-			wantErrPrefix: "low variety", //"high repitition",
-		},
-		{
-			name: "h too low & repitition too high",
-			args: args{pwCandPtr: strPtr("12345566")},
-			wantCandidate: critic.PassCandidate{
-				StringVal:   "12345566",
-				Cardinality: 6,
-				H:           2.5,
-			},
-			wantErr:       true,
-			wantErrPrefix: "low entropy",
-		},
-		{
 			name: "good password",
 			args: args{pwCandPtr: strPtr("4D5f2A8E0fa3D9162dbAcfA543C730c80F980b92d60b833f2Ec97418c39e9")},
 			wantCandidate: critic.PassCandidate{
@@ -78,7 +53,33 @@ func Test_checkEntropy(t *testing.T) {
 				H:           4.184778,
 			},
 			wantErr:       false,
-			wantErrPrefix: "high repititon",
+			wantErrPrefix: "",
+		},
+		{
+			name: "empty case (non homogeneity type error)",
+			args: args{
+				pwCandPtr: new(string),
+			},
+			wantCandidate: critic.PassCandidate{
+				StringVal:   "",
+				Cardinality: 0,
+				H:           0,
+			},
+			wantErr:       true,
+			wantErrPrefix: "non 'homogeneity' type",
+		},
+		{
+			name: "123123123",
+			args: args{
+				pwCandPtr: strPtr("123123123"),
+			},
+			wantCandidate: critic.PassCandidate{
+				StringVal:   "123123123",
+				Cardinality: 3,
+				H:           1.5849626,
+			},
+			wantErr:       true,
+			wantErrPrefix: "high repetition",
 		},
 	}
 

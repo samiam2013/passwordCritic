@@ -14,7 +14,7 @@ import (
 
 // maybe add (-v|--verbose) or (-q|--quiet) flag?
 
-const maxLowestCharProb = 0.2
+const charProbFloor = 0.1
 const minCandidateCardinality = 6 // e.g. 8 char pass with 2 repititions
 
 func main() {
@@ -67,20 +67,16 @@ func checkEntropy(pwCandPtr *string) (candidate critic.PassCandidate, err error)
 	fmt.Println("Entropy of the password candidate: ", h)
 	if err != nil {
 		if _, ok := err.(*types.HomogeneityError); !ok {
-			err = fmt.Errorf("non-homogeneity error encounter checking entropy"+
+			err = fmt.Errorf("non 'homogeneity' type error encounter checking entropy"+
 				" of candidate: %s", err.Error())
 			return
 		}
 		hmgError := err.(*types.HomogeneityError)
-		if hmgError.LowestProbability > maxLowestCharProb {
+		if hmgError.LowestProbability < charProbFloor ||
+			hmgError.Cardinality < minCandidateCardinality {
 			// give an error msg about the least frequent character being too common
 			err = fmt.Errorf("high repetition of characters: minimum %f (percentage 0 to 1)",
 				hmgError.LowestProbability)
-			return
-		} else if hmgError.Cardinality < minCandidateCardinality {
-			// give an error msg about the repetition of characters
-			err = fmt.Errorf("low variety of characters: %d (expect > %d)",
-				hmgError.Cardinality, minCandidateCardinality)
 			return
 		} else {
 			// give a default case error msg

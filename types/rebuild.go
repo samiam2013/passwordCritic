@@ -4,19 +4,24 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 )
 
 // CacheFolderPath keeps a single reference to password list directory
 const CacheFolderPath = "../cache"
 
+const DefaultBitsetFile = CacheFolderPath + "/defaultFilter.json"
+
+var files map[int]string = map[int]string{
+	1_000:     CacheFolderPath + "/1000.txt",
+	10_000:    CacheFolderPath + "/10000.txt",
+	100_000:   CacheFolderPath + "/100000.txt",
+	1_000_000: CacheFolderPath + "/1000000.txt",
+}
+
 func RebuildFilters() (map[int]BloomFilter, error) {
-	files := map[int]string{
-		1_000:     CacheFolderPath + "/1000.txt",
-		10_000:    CacheFolderPath + "/10000.txt",
-		100_000:   CacheFolderPath + "/100000.txt",
-		1_000_000: CacheFolderPath + "/1000000.txt",
-	}
+
 	filters := make(map[int]BloomFilter)
 	for count, filepath := range files {
 		bitsNeeded := int(float32(count) * 12.364167) // only works for 3 hash functions
@@ -35,7 +40,29 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 		filters[count] = *newFilter
 	}
 
+	// save those filters
+	bitset := BitsetList{
+		List: map[int][]bool{},
+	}
+	for elems, filter := range filters {
+		bitset.addFilter(elems, filter)
+	}
+	bitset.WriteToFile(DefaultBitsetFile)
+
 	return filters, nil
+}
+
+func LoadFilters() (filters map[int]BloomFilter, err error) {
+	bitset := BitsetList{
+		List: map[int][]bool{},
+	}
+	filters, err = bitset.LoadFromFile(DefaultBitsetFile)
+	if err != nil {
+		return
+	}
+
+	log.Printf("LoadFitlers() len: %d", len(filters))
+	return
 }
 
 func buildFilter(bits int, fh io.Reader) (bFilter *BloomFilter, err error) {

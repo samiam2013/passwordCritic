@@ -19,15 +19,15 @@ type BFilter interface {
 
 // BloomFilter probabilistic bloom filter struct
 type BloomFilter struct {
-	bitset    []bool // The bloom-filter bitset
+	Bitset    []bool // The bloom-filter bitset
 	k         uint   // Number of hash values
-	n         uint   // Number of elements in the filter
+	N         uint   // Number of elements in the filter
 	hashFuncs []hash.Hash64
 }
 
 // GetBitSet needed for testing?
 func (b *BloomFilter) GetBitset() []bool {
-	return b.bitset
+	return b.Bitset
 }
 
 // force Bloomfilter Struct to fit the interface defined by BFilter
@@ -36,9 +36,9 @@ var _ BFilter = &BloomFilter{}
 // NewBloom returns a new BloomFilter struct with n bits and default hash funcs
 func NewBloom(n int) *BloomFilter {
 	return &BloomFilter{
-		bitset:    make([]bool, n),
+		Bitset:    make([]bool, n),
 		k:         3, // we have 3 hash functions (for now)
-		n:         uint(0),
+		N:         uint(0),
 		hashFuncs: []hash.Hash64{murmur3.New64(), fnv.New64(), fnv.New64a()},
 	}
 }
@@ -50,12 +50,12 @@ func (bf *BloomFilter) Add(item []byte) error {
 		return fmt.Errorf("couldn't get hashes for adding item to bloom filter: %s", err.Error())
 	}
 
-	m := uint(len(bf.bitset))
+	m := uint(len(bf.Bitset))
 	for i := uint(0); i < bf.k; i++ {
 		position := uint(hashes[i]) % m
-		bf.bitset[uint(position)] = true
+		bf.Bitset[uint(position)] = true
 	}
-	bf.n++
+	bf.N++
 	return nil
 }
 
@@ -83,10 +83,10 @@ func (bf *BloomFilter) Test(item []byte) (exists bool, failure error) {
 	}
 
 	exists = true
-	m := uint(len(bf.bitset))
+	m := uint(len(bf.Bitset))
 	for i := uint(0); i < bf.k; i++ {
 		position := uint(hashes[i]) % m
-		if !bf.bitset[uint(position)] {
+		if !bf.Bitset[uint(position)] {
 			exists = false
 			break
 		}

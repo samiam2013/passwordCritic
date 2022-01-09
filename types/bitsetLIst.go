@@ -26,8 +26,19 @@ func (bl *BitsetList) addFilter(elems int, b BloomFilter) error {
 	if _, ok := bl.List[elems]; ok {
 		return fmt.Errorf("key (# passwords) '%d' already set", elems)
 	}
-	bl.List[elems] = b.bitset
+	bl.List[elems] = b.Bitset
 	return nil
+}
+
+func (bl *BitsetList) getFilters() (list map[int]BloomFilter) {
+	list = make(map[int]BloomFilter)
+	for elems, Bits := range bl.List {
+		newFilter := *NewBloom(len(Bits))
+		newFilter.Bitset = Bits
+		newFilter.N = uint(elems)
+		list[elems] = newFilter
+	}
+	return
 }
 
 func (bl *BitsetList) WriteToFile(pathToFile string) error {
@@ -52,5 +63,8 @@ func (bl *BitsetList) LoadFromFile(pathToFile string) (list map[int]BloomFilter,
 		return
 	}
 	err = json.Unmarshal(fileBytes, bl)
+
+	list = bl.getFilters()
+
 	return
 }

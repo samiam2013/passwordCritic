@@ -52,10 +52,8 @@ func main() {
 		log.Println(err)
 	}
 
-	log.Printf("filters len: %d", len(filters))
-
 	for elemsLen, bFilter := range filters {
-		log.Printf("checking filter with %d elements....", elemsLen)
+		//log.Printf("checking filter with %d elements....", elemsLen)
 		exists, err := bFilter.Test([]byte(*pwCandPtr))
 		if err != nil {
 			log.Fatalf("error checking candidate against %d passwords list: %s",
@@ -67,6 +65,7 @@ func main() {
 		} else if exists {
 			log.Printf("password common, found in list with %d elements, "+
 				"but not more common than %d, minimum set rarity.", elemsLen, minRarity)
+			break
 		}
 	}
 

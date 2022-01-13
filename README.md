@@ -2,24 +2,31 @@
 
 
 ###  github.com/samiam2013/passwordCritic
-a Go module for critiquing your selection of passwords
+a Go module to
 
-first using the entropy of your chosen password, then a set of bloom filters for common passwords. 
+* check the entropy of a password (variety & repitition)
+* check if the password shows up in a bloom filter built with a list of common passwords
 
-if the password is bad, the code will explain why.
-
-## the current plan
-
-check the entropy of the password, stopping things like "12341234"
-
-if it passes an entropy check, look for it in a bloom filter of the top 10,000,000 most common passwords, 
-
-if it's found in the 10MM list, look it up in a 10k and then 100 item bloom filter, 
-
-if you find it in a 10k list from that 10MM, you get back an error
+## Installing & Running
+```
+git clone https://github.com/samiam2013/passwordCritic.git
+cd passwordCritic/
+go test ./... # make sure the tests pass
+cd cmd/
+go build .
+go: downloading github.com/spaolacci/murmur3 v1.1.0
+./cmd -r -p password123
+```
+and you can expect some output like
+```
+Entropy of the password candidate:  3.2776136
+2022/01/13 15:25:08 password common, found in list with 100000 elements, but not more common than 1000, minimum set rarity.
+{StringVal:password123 Cardinality:10 H:3.2776136}
+```
 
 ## TODO:
+ * figure out why only first ?1/10th of filters are being used
  * test frequency of false positives for a given BloomFilter.bitSet size
  * benchmark algorithms used by bloom filter for hashing 
- * serialize the filter to a file included in the library so the filter does not have to be computed from a list when included as a go module
- * look up the most ubiquitous way to get a list of things from the internet as a go module, ?maybe consider forking the list and using git from inside go for updates?
+ * serialize the filter to something more efficient than the 0|1 mapped JSON
+ * add a backup source for commmon password lists

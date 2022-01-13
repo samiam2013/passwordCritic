@@ -18,7 +18,7 @@ func Init() {
 
 func TestBitsetList_LoadFromRebuild(t *testing.T) {
 	type fields struct {
-		List map[int][]bool
+		List map[int][]ZeroOneBool
 	}
 	type args struct {
 		filters map[int]BloomFilter
@@ -34,7 +34,7 @@ func TestBitsetList_LoadFromRebuild(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int][]bool{},
+				List: map[int][]ZeroOneBool{},
 			},
 			args: args{
 				filters: list,
@@ -56,7 +56,7 @@ func TestBitsetList_LoadFromRebuild(t *testing.T) {
 
 func TestBitsetList_WriteToFile(t *testing.T) {
 	type fields struct {
-		List map[int][]bool
+		List map[int][]ZeroOneBool
 	}
 	type args struct {
 		pathToFile string
@@ -71,7 +71,7 @@ func TestBitsetList_WriteToFile(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int][]bool{4: {true, false, false, true}},
+				List: map[int][]ZeroOneBool{4: {true, false, false, true}},
 			},
 			args: args{
 				pathToFile: "../cache/test_write.json",

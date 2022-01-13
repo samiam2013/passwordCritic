@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 )
 
@@ -14,10 +13,10 @@ const CacheFolderPath = "../cache"
 const DefaultBitsetFile = CacheFolderPath + "/defaultFilter.json"
 
 var files map[int]string = map[int]string{
-	1_000:     CacheFolderPath + "/1000.txt",
-	10_000:    CacheFolderPath + "/10000.txt",
-	100_000:   CacheFolderPath + "/100000.txt",
-	1_000_000: CacheFolderPath + "/1000000.txt",
+	1_000:   CacheFolderPath + "/1000.txt",
+	10_000:  CacheFolderPath + "/10000.txt",
+	100_000: CacheFolderPath + "/100000.txt",
+	// 1_000_000: CacheFolderPath + "/1000000.txt",
 }
 
 func RebuildFilters() (map[int]BloomFilter, error) {
@@ -61,7 +60,6 @@ func LoadFilters() (filters map[int]BloomFilter, err error) {
 		return
 	}
 
-	log.Printf("LoadFitlers() len: %d", len(filters))
 	return
 }
 

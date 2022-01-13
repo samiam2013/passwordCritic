@@ -1,9 +1,6 @@
 # don't want to duplicate this kind person's code https://github.com/dimpram/entropy-calculator/blob/master/entropy.py
 python_implementation.py
 
-# the binary doesn't belong in github
-passwordCritic
-
 # the passwords file doesn't need to be stored here, just use wget_passwords.sh
 10-million-password-list-top-1000000.txt
 
@@ -14,7 +11,7 @@ cache/*.txt
 coverage.txt
 
 # not this dummy file generated while testing the download function
-./cache/dummyFilePostmanEcho.json
+**/test_write.json
 
 # don't save this binary
-cmd/cmd
+**/cmd

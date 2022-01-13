@@ -31,7 +31,7 @@ func (bit *ZeroOneBool) UnmarshalJSON(data []byte) error {
 	} else if asInt == 0 || string(data) == "false" {
 		*bit = false
 	} else {
-		return fmt.Errorf("Boolean unmarshall error: invalid input %s", data)
+		return fmt.Errorf("boolean unmarshall error: invalid input %s", data)
 	}
 	return nil
 }

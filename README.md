@@ -14,7 +14,6 @@ cd passwordCritic/
 go test ./... # make sure the tests pass
 cd cmd/
 go build .
-go: downloading github.com/spaolacci/murmur3 v1.1.0
 ./cmd -r -p password123
 ```
 and you can expect some output like

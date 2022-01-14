@@ -59,7 +59,7 @@ func main() {
 			log.Fatalf("error checking candidate against %d passwords list: %s",
 				elemsLen, err.Error())
 		}
-		if exists && (minRarity > elemsLen) {
+		if exists && (minRarity >= elemsLen) {
 			log.Fatalf("password too common, found in list of %d passwords, "+
 				"minimum rarity set to %d", elemsLen, minRarity)
 		} else if exists {

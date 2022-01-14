@@ -51,7 +51,7 @@ func (bl *BitsetList) addFilter(elems int, b BloomFilter) error {
 		return fmt.Errorf("key (# passwords) '%d' already set", elems)
 	}
 	bools := make([]ZeroOneBool, len(b.Bitset))
-	for i := 0; i < elems; i++ {
+	for i := 0; i < len(b.Bitset); i++ {
 		bools[i] = ZeroOneBool(b.Bitset[i]) //b.Bitset[i]
 	}
 	bl.List[elems] = bools

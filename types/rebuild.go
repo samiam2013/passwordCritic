@@ -10,6 +10,7 @@ import (
 // CacheFolderPath keeps a single reference to password list directory
 const CacheFolderPath = "../cache"
 
+// DefaultBitsetFile determines what file the pre-compiled filter exists or gets rebuilt
 const DefaultBitsetFile = CacheFolderPath + "/defaultFilter.json"
 
 var files map[int]string = map[int]string{
@@ -19,8 +20,8 @@ var files map[int]string = map[int]string{
 	// 1_000_000: CacheFolderPath + "/1000000.txt",
 }
 
+// RebuildFilters looks at the default filter paths and rebuilds the Bloomfilters
 func RebuildFilters() (map[int]BloomFilter, error) {
-
 	filters := make(map[int]BloomFilter)
 	for count, filepath := range files {
 		bitsNeeded := int(float32(count) * 12.364167) // only works for 3 hash functions
@@ -39,7 +40,6 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 		filters[count] = *newFilter
 	}
 
-	// save those filters
 	bitset := BitsetList{
 		List: map[int][]ZeroOneBool{},
 	}
@@ -51,6 +51,7 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 	return filters, nil
 }
 
+// LoadFilters loads the BloomFilters from the Default BitsetFile location
 func LoadFilters() (filters map[int]BloomFilter, err error) {
 	bitset := BitsetList{
 		List: map[int][]ZeroOneBool{},

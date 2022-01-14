@@ -13,8 +13,10 @@ type BitsetList struct {
 	List map[int][]ZeroOneBool `json:"list"`
 }
 
+// ZeroOneBool masks the JSON marshal behavior of bool to be int 0|1 instead of string true|false
 type ZeroOneBool bool
 
+// MarshalJSON marshals the boolean types to string 0 or 1
 func (bit *ZeroOneBool) MarshalJSON() ([]byte, error) {
 	if *bit {
 		return []byte("1"), nil
@@ -22,6 +24,7 @@ func (bit *ZeroOneBool) MarshalJSON() ([]byte, error) {
 	return []byte("0"), nil
 }
 
+// UnmarshalJSON unpacks the string 1 or 0 to a boolean type
 func (bit *ZeroOneBool) UnmarshalJSON(data []byte) error {
 	asInt, err := strconv.Atoi(string(data))
 	if err != nil {
@@ -36,6 +39,7 @@ func (bit *ZeroOneBool) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// LoadFromRebuild takes in the map from LoadFromFile or DownloadLists and puts the filters into the BitsetList
 func (bl *BitsetList) LoadFromRebuild(filters map[int]BloomFilter) error {
 	for elems, bFilter := range filters {
 		err := bl.addFilter(elems, bFilter)
@@ -71,6 +75,7 @@ func (bl *BitsetList) getFilters() (list map[int]BloomFilter) {
 	return
 }
 
+// WriteToFile puts the BitsetList in a persistent filestor in JSON format
 func (bl *BitsetList) WriteToFile(pathToFile string) error {
 	fh, err := os.Create(pathToFile)
 	if err != nil {
@@ -87,6 +92,7 @@ func (bl *BitsetList) WriteToFile(pathToFile string) error {
 	return err
 }
 
+// LoadFromFile reads in the BitsetList stored in JSON by BitsetList.WriteToFile()
 func (bl *BitsetList) LoadFromFile(pathToFile string) (list map[int]BloomFilter, err error) {
 	fileBytes, err := os.ReadFile(pathToFile)
 	if err != nil {

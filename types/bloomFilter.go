@@ -25,7 +25,7 @@ type BloomFilter struct {
 	hashFuncs []hash.Hash64
 }
 
-// GetBitSet needed for testing?
+// GetBitset for returing the inner slice of booleans is needed for testing the bloom filters
 func (b *BloomFilter) GetBitset() []bool {
 	return b.Bitset
 }
@@ -44,25 +44,25 @@ func NewBloom(n int) *BloomFilter {
 }
 
 // Add the item into the bloom filter set by hashing in over the hash functions
-func (bf *BloomFilter) Add(item []byte) error {
-	hashes, err := bf.hashValues(item)
+func (b *BloomFilter) Add(item []byte) error {
+	hashes, err := b.hashValues(item)
 	if err != nil {
 		return fmt.Errorf("couldn't get hashes for adding item to bloom filter: %s", err.Error())
 	}
 
-	m := uint(len(bf.Bitset))
-	for i := uint(0); i < bf.k; i++ {
+	m := uint(len(b.Bitset))
+	for i := uint(0); i < b.k; i++ {
 		position := uint(hashes[i]) % m
-		bf.Bitset[uint(position)] = true
+		b.Bitset[uint(position)] = true
 	}
-	bf.N++
+	b.N++
 	return nil
 }
 
 // Calculates all the hash values by applying in the item over the hash functions
-func (bf *BloomFilter) hashValues(item []byte) ([]uint64, error) {
+func (b *BloomFilter) hashValues(item []byte) ([]uint64, error) {
 	var result []uint64
-	for _, hashFunc := range bf.hashFuncs {
+	for _, hashFunc := range b.hashFuncs {
 		_, err := hashFunc.Write(item)
 		if err != nil {
 			return result, fmt.Errorf(
@@ -75,18 +75,18 @@ func (bf *BloomFilter) hashValues(item []byte) ([]uint64, error) {
 }
 
 // Test if the item hash in the bloom filter is set by iterating over the hash functions
-func (bf *BloomFilter) Test(item []byte) (exists bool, failure error) {
-	hashes, err := bf.hashValues(item)
+func (b *BloomFilter) Test(item []byte) (exists bool, failure error) {
+	hashes, err := b.hashValues(item)
 	if err != nil {
 		failure = fmt.Errorf("failed hashing to test item in filter: %s", err.Error())
 		return
 	}
 
 	exists = true
-	m := uint(len(bf.Bitset))
-	for i := uint(0); i < bf.k; i++ {
+	m := uint(len(b.Bitset))
+	for i := uint(0); i < b.k; i++ {
 		position := uint(hashes[i]) % m
-		if !bf.Bitset[uint(position)] {
+		if !b.Bitset[uint(position)] {
 			exists = false
 			break
 		}

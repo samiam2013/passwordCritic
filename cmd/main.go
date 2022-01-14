@@ -106,11 +106,10 @@ func checkEntropy(pwCandPtr *string) (candidate critic.PassCandidate, err error)
 			err = fmt.Errorf("high repetition of characters: minimum %f (percentage 0 to 1)",
 				hmgError.LowestProbability)
 			return
-		} else {
-			// give a default case error msg
-			err = fmt.Errorf("low entropy for password: mix of low variety and length")
-			return
 		}
+		// give a default case error msg
+		err = fmt.Errorf("low entropy for password: mix of low variety and length")
+		return
 	}
 	return
 }

@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-/* DownloadLists encapsulates code for downloading common password list(s)
- * 	and provides a returned list of the sizes and paths to downloaded files */
+// DownloadLists encapsulates code for downloading common password list(s) and provides a returned list of the sizes and paths to downloaded files
 func DownloadLists() (pwLists map[int]string, err error) {
-	const dmCommonFolderURL string = "https://raw.githubusercontent.com/danielmiessler/SecLists/aa0eb72f3871b01372596a34fb5378910df50073/Passwords/Common-Credentials/"
+	const dmCommonFolderURL string = "https://raw.githubusercontent.com/danielmiessler/SecLists/" +
+		"aa0eb72f3871b01372596a34fb5378910df50073/Passwords/Common-Credentials/"
 	pwLists = map[int]string{
 		// 1_000_000: dmCommonFolderURL + "10-million-password-list-top-1000000.txt",
 		100_000: dmCommonFolderURL + "10-million-password-list-top-100000.txt",

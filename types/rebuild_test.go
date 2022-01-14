@@ -67,9 +67,9 @@ func TestRebuildFilters(t *testing.T) {
 			nFilters: 3, //4,
 			filterLens: map[int]int{
 				//1_000_000: 12364167, # probably too long for the set
-				100_000:   1236416,
-				10_000:    123641,
-				1000:      12364,
+				100_000: 1236416,
+				10_000:  123641,
+				1000:    12364,
 			},
 			clearCache: false,
 			wantErr:    false,

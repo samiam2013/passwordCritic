@@ -40,8 +40,8 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 		filters[count] = *newFilter
 	}
 
-	bitset := BitsetList{
-		List: map[int][]ZeroOneBool{},
+	bitset := BitSetMap{
+		List: make(map[int]BitSet),
 	}
 	for elems, filter := range filters {
 		bitset.addFilter(elems, filter)
@@ -53,8 +53,8 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 
 // LoadFilters loads the BloomFilters from the Default BitsetFile location
 func LoadFilters() (filters map[int]BloomFilter, err error) {
-	bitset := BitsetList{
-		List: map[int][]ZeroOneBool{},
+	bitset := BitSetMap{
+		List: make(map[int]BitSet),
 	}
 	filters, err = bitset.LoadFromFile(DefaultBitsetFile)
 	if err != nil {

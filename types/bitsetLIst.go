@@ -12,20 +12,18 @@ type BitSetMap struct {
 	List map[int]BitSet `json:"list"`
 }
 
-// ZeroOneBool masks the JSON marshal behavior of bool to be int 0|1 instead of string true|false
-type ZeroOneBool bool
-
 // BitSet holds a slice of ZeroOneBools for custom Marshall/Unmarshall
 type BitSet struct {
-	Set []ZeroOneBool
+	Set []bool
 }
 
 // MarshalJSON marshals the boolean types to string 0 or 1
-func (bs BitSet) MarshalJSON() ([]byte, error) {
+func (bs *BitSet) MarshalJSON() ([]byte, error) {
 	// base64 holds 6 bits in a byte, so iterate over each 6 bits getting 1 byte
 	bitLen := len(bs.Set)
 	bitLen += 6 - (bitLen % 6)
 	noBytes := bitLen / 6
+	fmt.Printf("number of bytes to marshall: %d", noBytes)
 	byteArr := make([]byte, noBytes)
 	for byteIdx := 0; byteIdx < noBytes-1; byteIdx++ {
 		for i := byteIdx * 6; i < (byteIdx*6)+6; i++ {
@@ -37,12 +35,12 @@ func (bs BitSet) MarshalJSON() ([]byte, error) {
 			}
 		}
 	}
-	return []byte(string(byteArr)), nil
+	return byteArr, nil
 }
 
 // UnmarshalJSON unpacks the string 1 or 0 to a set of sythetic boolean type
 func (bs *BitSet) UnmarshalJSON(data []byte) error {
-	bs.Set = make([]ZeroOneBool, len(bs.Set)*6)
+	bs.Set = make([]bool, len(bs.Set)*6)
 	for i, byt := range data {
 		bitOffset := i * 6
 		for j := 0; j < 6; j++ {
@@ -50,7 +48,7 @@ func (bs *BitSet) UnmarshalJSON(data []byte) error {
 			//	the 2^j generated mask and checking if they are set
 			//	by comparing against 0
 			mask := byte(2 ^ j)
-			bs.Set[bitOffset+j] = ZeroOneBool((mask & byt) != byte(0))
+			bs.Set[bitOffset+j] = (mask & byt) != byte(0)
 		}
 	}
 	return nil
@@ -72,10 +70,10 @@ func (bl *BitSetMap) addFilter(elems int, b BloomFilter) error {
 		return fmt.Errorf("key (# passwords) '%d' already set", elems)
 	}
 	bs := BitSet{
-		Set: make([]ZeroOneBool, len(b.Bitset)),
+		Set: make([]bool, len(b.Bitset)),
 	}
 	for i := 0; i < len(b.Bitset); i++ {
-		bs.Set[i] = ZeroOneBool(b.Bitset[i]) //b.Bitset[i]
+		bs.Set[i] = b.Bitset[i]
 	}
 	bl.List[elems] = bs
 	return nil

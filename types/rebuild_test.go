@@ -61,7 +61,14 @@ func TestRebuildFilters(t *testing.T) {
 		filterLens map[int]int // length instead of []types.BloomFilter
 		clearCache bool        // whether or not cache should be cleared before rebuild to create error cases
 		wantErr    bool
-	}{
+		}{
+		{
+			name:       "sad path",
+			nFilters:   0,
+			filterLens: map[int]int{},
+			clearCache: true,
+			wantErr:    true,
+		},
 		{
 			name:     "happy path",
 			nFilters: 3, //4,
@@ -73,13 +80,6 @@ func TestRebuildFilters(t *testing.T) {
 			},
 			clearCache: false,
 			wantErr:    false,
-		},
-		{
-			name:       "sad path",
-			nFilters:   0,
-			filterLens: map[int]int{},
-			clearCache: true,
-			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {

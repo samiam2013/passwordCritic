@@ -1,7 +1,9 @@
 package types
 
 import (
+	"fmt"
 	"log"
+	"reflect"
 	"testing"
 )
 
@@ -86,6 +88,64 @@ func TestBitSetMap_WriteToFile(t *testing.T) {
 			}
 			if err := bl.WriteToFile(tt.args.pathToFile); (err != nil) != tt.wantErr {
 				t.Errorf("BitSetMap.WriteToFile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestBitSet_MarshalJSON(t *testing.T) {
+	type fields struct {
+		Set []bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []byte
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			fields: fields{
+				Set: []bool{
+					true, false, true, false, true, false,
+					false, true, false, true, false, true,
+					true, false, true, false, true, false,
+					false, true, false, true, false, true,
+					true, false, true, false, true, false,
+					false, true, false, true, false, true,
+					true, false, true, false, true, false,
+					false, true, false, true, false, true,
+					true, false, true, false, true, false,
+					false, true, false, true, false, true,
+					true, false, true, false, true, false,
+					false, true, false, true, false, true,
+					false, false, false, false, false, false,
+					false, false, false, false, false, false,
+					false, false, false, false, false, false,
+					false, false, false, false, false, false,
+				},
+			},
+			want:    []byte{},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bs := BitSet{
+				Set: tt.fields.Set,
+			}
+			got, err := bs.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BitSet.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				binaryStr := ""
+				for _, byt := range got {
+					binaryStr += fmt.Sprintf("%08b\n", byt)
+				}
+				t.Errorf("BitSet.MarshalJSON() = '%s', want '%v'", binaryStr, tt.want)
 			}
 		})
 	}

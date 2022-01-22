@@ -27,10 +27,9 @@ func (bs BitSet) MarshalJSON() ([]byte, error) {
 	bitLen += 6 - (bitLen % 6)
 	noBytes := bitLen / 6
 	byteArr := make([]byte, noBytes)
-	for byteIdx := 0; byteIdx < noBytes; byteIdx++ {
-		bitIdx := byteIdx * 6
-		for i := 0; i < 6; i++ {
-			if bs.Set[bitIdx+i] {
+	for byteIdx := 0; byteIdx < noBytes-1; byteIdx++ {
+		for i := byteIdx * 6; i < (byteIdx*6)+6; i++ {
+			if bs.Set[i] {
 				// mask the current bit
 				byteArr[byteIdx] |= byte(2 ^ i)
 			} else {

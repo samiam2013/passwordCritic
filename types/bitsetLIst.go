@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -25,13 +26,17 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 	noBytes := bitLen / 6
 	fmt.Printf("number of bytes to marshall: %d", noBytes)
 	byteArr := make([]byte, noBytes)
-	for byteIdx := 0; byteIdx < noBytes-1; byteIdx++ {
-		for i := byteIdx * 6; i < (byteIdx*6)+6; i++ {
+	for byteIdx := 1; byteIdx < noBytes; byteIdx++ {
+		for bit := 0; bit < 6; bit++ {
+			maskVal := int(math.Pow(2, float64(bit)))
+			fmt.Printf("maskVal: %d\n", maskVal)
+			i := bit + ((byteIdx - 1) * 6)
 			if bs.Set[i] {
 				// mask the current bit
-				byteArr[byteIdx] |= byte(2 ^ i)
+				byteArr[byteIdx] |= byte(maskVal)
 			} else {
-				byteArr[byteIdx] &= (byte(2^i) ^ byte(255))
+				const ones = byte(255)
+				byteArr[byteIdx] &= (byte(maskVal) ^ ones)
 			}
 		}
 	}

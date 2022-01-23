@@ -108,9 +108,13 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 			name: "Happy Path",
 			fields: fields{
 				Set: []bool{
-					true, false, true, false, true, false,
-					false, true, false, true, false, true,
-					true, false, true, false,
+					false, false, false, false, false, true,
+					false, false, false, false, true, true,
+					false, false, false, true, true, true,
+					false, false, true, true, true, true,
+					false, true, true, true, true, true,
+					true, true, true, true, true, true,
+					true,
 				},
 			},
 			want:    []byte{},
@@ -130,7 +134,7 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				binaryStr := ""
 				for _, byt := range got {
-					binaryStr += fmt.Sprintf("%08b ", byt)
+					binaryStr += fmt.Sprintf("%08b\n", byt)
 				}
 				t.Errorf("BitSet.MarshalJSON() = '%s', want '%v'", binaryStr, tt.want)
 			}

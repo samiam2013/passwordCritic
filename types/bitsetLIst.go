@@ -22,15 +22,19 @@ type BitSet struct {
 func (bs *BitSet) MarshalJSON() ([]byte, error) {
 	// base64 holds 6 bits in a byte, so iterate over each 6 bits getting 1 byte
 	bitLen := len(bs.Set)
-	bitLen += 6 - (bitLen % 6)
+	if bitLen%6 != 0 {
+		bitRemainder := 6 - (bitLen % 6)
+		bitLen += bitRemainder
+		bs.Set = append(bs.Set, make([]bool, bitRemainder)...)
+	}
 	noBytes := bitLen / 6
 	fmt.Printf("number of bytes to marshall: %d", noBytes)
-	byteArr := make([]byte, noBytes)
-	for byteIdx := 1; byteIdx < noBytes; byteIdx++ {
+	byteArr := make([]byte, noBytes+1)
+	for byteIdx := 0; byteIdx < noBytes; byteIdx++ {
 		for bit := 0; bit < 6; bit++ {
 			maskVal := int(math.Pow(2, float64(bit)))
-			fmt.Printf("maskVal: %d\n", maskVal)
-			i := bit + ((byteIdx - 1) * 6)
+			// fmt.Printf("maskVal: %d\n", maskVal)
+			i := bit + ((byteIdx) * 6)
 			if bs.Set[i] {
 				// mask the current bit
 				byteArr[byteIdx] |= byte(maskVal)

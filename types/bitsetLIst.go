@@ -13,9 +13,14 @@ type BitSetMap struct {
 	List map[int]BitSet `json:"list"`
 }
 
+// MarshalJSON overrides the interface{} marshalling behavior or BitsetMap
+func (bm *BitSetMap) MarshalJSON() ([]byte, error) {
+	return []byte(`{"list":{ "1000": {"bitset": [true, false, true]} }}`), nil
+}
+
 // BitSet holds a slice of ZeroOneBools for custom Marshall/Unmarshall
 type BitSet struct {
-	Set []bool
+	Set []bool `json:"bitset"`
 }
 
 // MarshalJSON marshals the boolean types to string 0 or 1
@@ -29,7 +34,7 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 	}
 	noBytes := bitLen / 6
 	fmt.Printf("number of bytes to marshall: %d", noBytes)
-	byteArr := make([]byte, noBytes+1)
+	byteArr := make([]byte, noBytes)
 	for byteIdx := 0; byteIdx < noBytes; byteIdx++ {
 		for bit := 0; bit < 6; bit++ {
 			maskVal := int(math.Pow(2, float64(bit)))
@@ -43,6 +48,7 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 				byteArr[byteIdx] &= (byte(maskVal) ^ ones)
 			}
 		}
+		byteArr[byteIdx] += byte(48)
 	}
 	return byteArr, nil
 }

@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"log"
 	"reflect"
 	"testing"
@@ -114,10 +113,9 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 					false, false, true, true, true, true,
 					false, true, true, true, true, true,
 					true, true, true, true, true, true,
-					true,
 				},
 			},
-			want:    []byte{},
+			want:    []byte("P`hlno"),
 			wantErr: false,
 		},
 	}
@@ -132,11 +130,11 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				binaryStr := ""
-				for _, byt := range got {
-					binaryStr += fmt.Sprintf("%08b\n", byt)
-				}
-				t.Errorf("BitSet.MarshalJSON() = '%s', want '%v'", binaryStr, tt.want)
+				// binaryStr := ""
+				// for _, byt := range got {
+				// 	binaryStr += fmt.Sprintf("%08b\n", byt)
+				// }
+				t.Errorf("BitSet.MarshalJSON() = '%s', want '%v'", got, tt.want)
 			}
 		})
 	}

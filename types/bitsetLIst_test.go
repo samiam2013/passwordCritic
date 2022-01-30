@@ -72,14 +72,25 @@ func TestBitSetMap_WriteToFile(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int]BitSet{},
+				List: map[int]BitSet{
+					10: {
+						Set: []bool{
+							false, false, false, false, false, true,
+						false, false, false, false, true, true,
+						false, false, false, true, true, true,
+						false, false, true, true, true, true,
+						false, true, true, true, true, true,
+						true, true, true, true, true, true},
+					},
 			},
+		},
 			args: args{
 				pathToFile: "../cache/test_write.json",
 			},
 			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			bl := &BitSetMap{

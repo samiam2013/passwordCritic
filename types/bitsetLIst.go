@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"strconv"
 )
 
 // BitSetMap holds lists of the built filters for json storage/loading
@@ -14,8 +15,24 @@ type BitSetMap struct {
 }
 
 // MarshalJSON overrides the interface{} marshalling behavior or BitsetMap
-func (bm *BitSetMap) MarshalJSON() ([]byte, error) {
-	return []byte(`{"list":{ "1000": {"bitset": [true, false, true]} }}`), nil
+func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
+	list := make(map[int][]byte, len(bl.List))
+	for nElem, bitSet := range bl.List {
+		bytes, err := bitSet.MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		list[nElem] = bytes
+	}
+	concat := []byte{}
+	for nElems, bytes := range list {
+		concat = append(concat, []byte(`{"`+strconv.Itoa(nElems)+`":{"bitset":"`+string(bytes)+`"}},`)...)
+	}
+	// strip the last comma added
+	concat = concat[:len(concat)-1]
+
+	//return []byte(`{"list":{ "1000": {"bitset": [true, false, true]} }}`), nil
+	return []byte(`{"list":[` + string(concat) + `]}`), nil
 }
 
 // BitSet holds a slice of ZeroOneBools for custom Marshall/Unmarshall

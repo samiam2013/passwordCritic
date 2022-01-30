@@ -76,14 +76,23 @@ func TestBitSetMap_WriteToFile(t *testing.T) {
 					10: {
 						Set: []bool{
 							false, false, false, false, false, true,
-						false, false, false, false, true, true,
-						false, false, false, true, true, true,
-						false, false, true, true, true, true,
-						false, true, true, true, true, true,
-						true, true, true, true, true, true},
+							false, false, false, false, true, true,
+							false, false, false, true, true, true,
+							false, false, true, true, true, true,
+							false, true, true, true, true, true,
+							true, true, true, true, true, true},
 					},
+					100: {
+						Set: []bool{
+							false, true, true, true, true, true,
+							false, false, true, true, true, true,
+							false, false, false, true, true, true,
+							false, false, false, false, true, true,
+							false, false, false, false, false, true,
+							true, true, true, true, true, true},
+					},
+				},
 			},
-		},
 			args: args{
 				pathToFile: "../cache/test_write.json",
 			},
@@ -126,7 +135,7 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 					true, true, true, true, true, true,
 				},
 			},
-			want:    []byte("P`hlno"),
+			want:    []byte("{\"bitset\":\"P`hlno\"}"),
 			wantErr: false,
 		},
 	}

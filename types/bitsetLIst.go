@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"strconv"
+	"reflect"
 )
 
 // BitSetMap holds lists of the built filters for json storage/loading
@@ -14,25 +14,40 @@ type BitSetMap struct {
 	List map[int]BitSet `json:"list"`
 }
 
+// The struct above creates dependency for example List needs to be index 0
+
 // MarshalJSON overrides the interface{} marshalling behavior or BitsetMap
 func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
-	list := make(map[int][]byte, len(bl.List))
+	list := make(map[int]string, len(bl.List))
 	for nElem, bitSet := range bl.List {
 		bytes, err := bitSet.MarshalJSON()
 		if err != nil {
 			return nil, err
 		}
-		list[nElem] = bytes
+		var unmrsld map[string]string
+		if err = json.Unmarshal(bytes, &unmrsld); err != nil {
+			return nil, fmt.Errorf("failed unmarshalling bitset into interface: %s", err.Error())
+		}
+		list[nElem] = string(unmrsld["bitset"])
 	}
-	concat := []byte{}
-	for nElems, bytes := range list {
-		concat = append(concat, []byte(`{"`+strconv.Itoa(nElems)+`":{"bitset":"`+string(bytes)+`"}},`)...)
-	}
-	// strip the last comma added
-	concat = concat[:len(concat)-1]
 
-	//return []byte(`{"list":{ "1000": {"bitset": [true, false, true]} }}`), nil
-	return []byte(`{"list":[` + string(concat) + `]}`), nil
+	// get the tag name for marshall
+	val := reflect.ValueOf(*bl)
+	tag, ok := val.Type().Field(0).Tag.Lookup("json")
+	if !ok {
+		return []byte{}, fmt.Errorf("error getting json tag for first field in BitSetMap")
+	}
+
+	toMarshal := map[string]interface{}{
+		tag: map[string]map[int]string{
+			"bitset":list, 
+		},
+	}
+	bytes, err := json.Marshal(toMarshal)
+	if err != nil {
+		return []byte{}, fmt.Errorf("failed marshalling final for BitSetList.MarshallJSON():%s", err.Error())
+	}
+	return bytes, nil
 }
 
 // BitSet holds a slice of ZeroOneBools for custom Marshall/Unmarshall
@@ -65,9 +80,17 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 				byteArr[byteIdx] &= (byte(maskVal) ^ ones)
 			}
 		}
-		byteArr[byteIdx] += byte(48)
+		byteArr[byteIdx] += byte(63)
 	}
-	return byteArr, nil
+	toMarshal := map[string]string{
+		"bitset": string(byteArr),
+	}
+	bytes, err := json.Marshal(toMarshal)
+	if err != nil {
+		return nil, fmt.Errorf("faild marshalling value for bitset: %s", err.Error())
+	}
+	return bytes, nil
+
 }
 
 // UnmarshalJSON unpacks the string 1 or 0 to a set of sythetic boolean type

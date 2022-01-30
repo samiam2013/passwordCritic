@@ -46,7 +46,10 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 	for elems, filter := range filters {
 		bitset.addFilter(elems, filter)
 	}
-	bitset.WriteToFile(DefaultBitsetFile)
+	err := bitset.WriteToFile(DefaultBitsetFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed writing filters to file in RebuildFilters(): %s", err.Error())
+	}
 
 	return filters, nil
 }

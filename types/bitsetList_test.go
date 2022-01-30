@@ -135,7 +135,7 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 					true, true, true, true, true, true,
 				},
 			},
-			want:    []byte("{\"bitset\":\"P`hlno\"}"),
+			want:    []byte(`{"bitset":"_ow{}~"}`),
 			wantErr: false,
 		},
 	}

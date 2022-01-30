@@ -40,7 +40,7 @@ func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
 
 	toMarshal := map[string]interface{}{
 		tag: map[string]map[int]string{
-			"bitset":list, 
+			"bitset": list,
 		},
 	}
 	bytes, err := json.Marshal(toMarshal)

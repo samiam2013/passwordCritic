@@ -40,21 +40,24 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 		filters[count] = *newFilter
 	}
 
-	bitset := BitsetList{
-		List: map[int][]ZeroOneBool{},
+	bitset := BitSetMap{
+		List: make(map[int]BitSet),
 	}
 	for elems, filter := range filters {
 		bitset.addFilter(elems, filter)
 	}
-	bitset.WriteToFile(DefaultBitsetFile)
+	err := bitset.WriteToFile(DefaultBitsetFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed writing filters to file in RebuildFilters(): %s", err.Error())
+	}
 
 	return filters, nil
 }
 
 // LoadFilters loads the BloomFilters from the Default BitsetFile location
 func LoadFilters() (filters map[int]BloomFilter, err error) {
-	bitset := BitsetList{
-		List: map[int][]ZeroOneBool{},
+	bitset := BitSetMap{
+		List: make(map[int]BitSet),
 	}
 	filters, err = bitset.LoadFromFile(DefaultBitsetFile)
 	if err != nil {

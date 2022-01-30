@@ -2,6 +2,7 @@ package types
 
 import (
 	"log"
+	"reflect"
 	"testing"
 )
 
@@ -16,9 +17,9 @@ func Init() {
 	}
 }
 
-func TestBitsetList_LoadFromRebuild(t *testing.T) {
+func TestBitSetMap_LoadFromRebuild(t *testing.T) {
 	type fields struct {
-		List map[int][]ZeroOneBool
+		List map[int]BitSet
 	}
 	type args struct {
 		filters map[int]BloomFilter
@@ -34,7 +35,7 @@ func TestBitsetList_LoadFromRebuild(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int][]ZeroOneBool{},
+				List: map[int]BitSet{},
 			},
 			args: args{
 				filters: list,
@@ -44,19 +45,19 @@ func TestBitsetList_LoadFromRebuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := &BitsetList{
+			bl := &BitSetMap{
 				List: tt.fields.List,
 			}
 			if err := bl.LoadFromRebuild(tt.args.filters); (err != nil) != tt.wantErr {
-				t.Errorf("BitsetList.LoadFromRebuild() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("BitSetMap.LoadFromRebuild() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestBitsetList_WriteToFile(t *testing.T) {
+func TestBitSetMap_WriteToFile(t *testing.T) {
 	type fields struct {
-		List map[int][]ZeroOneBool
+		List map[int]BitSet
 	}
 	type args struct {
 		pathToFile string
@@ -71,7 +72,26 @@ func TestBitsetList_WriteToFile(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int][]ZeroOneBool{4: {true, false, false, true}},
+				List: map[int]BitSet{
+					10: {
+						Set: []bool{
+							false, false, false, false, false, true,
+							false, false, false, false, true, true,
+							false, false, false, true, true, true,
+							false, false, true, true, true, true,
+							false, true, true, true, true, true,
+							true, true, true, true, true, true},
+					},
+					100: {
+						Set: []bool{
+							false, true, true, true, true, true,
+							false, false, true, true, true, true,
+							false, false, false, true, true, true,
+							false, false, false, false, true, true,
+							false, false, false, false, false, true,
+							true, true, true, true, true, true},
+					},
+				},
 			},
 			args: args{
 				pathToFile: "../cache/test_write.json",
@@ -79,13 +99,62 @@ func TestBitsetList_WriteToFile(t *testing.T) {
 			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := &BitsetList{
+			bl := &BitSetMap{
 				List: tt.fields.List,
 			}
 			if err := bl.WriteToFile(tt.args.pathToFile); (err != nil) != tt.wantErr {
-				t.Errorf("BitsetList.WriteToFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("BitSetMap.WriteToFile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestBitSet_MarshalJSON(t *testing.T) {
+	type fields struct {
+		Set []bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []byte
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			fields: fields{
+				Set: []bool{
+					false, false, false, false, false, true,
+					false, false, false, false, true, true,
+					false, false, false, true, true, true,
+					false, false, true, true, true, true,
+					false, true, true, true, true, true,
+					true, true, true, true, true, true,
+				},
+			},
+			want:    []byte("{\"bitset\":\"P`hlno\"}"),
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bs := BitSet{
+				Set: tt.fields.Set,
+			}
+			got, err := bs.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BitSet.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				// binaryStr := ""
+				// for _, byt := range got {
+				// 	binaryStr += fmt.Sprintf("%08b\n", byt)
+				// }
+				t.Errorf("BitSet.MarshalJSON() = '%s', want '%v'", got, tt.want)
 			}
 		})
 	}

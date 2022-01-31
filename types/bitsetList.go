@@ -50,6 +50,11 @@ func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
 	return bytes, nil
 }
 
+// UnmarshalJSON defines custom interaction with BitSet.UnmarshalJSON
+func (bl *BitSetMap) UnmarshalJSON(data []byte) error {
+	return nil
+}
+
 // BitSet holds a slice of ZeroOneBools for custom Marshall/Unmarshall
 type BitSet struct {
 	Set []bool `json:"bitset"`
@@ -80,7 +85,15 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 				byteArr[byteIdx] &= (byte(maskVal) ^ ones)
 			}
 		}
-		byteArr[byteIdx] += byte(63)
+
+		// 35 - 90 , 97-122
+		byteArr[byteIdx] += byte(42)
+		if byteArr[byteIdx] >= byte(60) {
+			byteArr[byteIdx] += byte(3)
+		}
+		if byteArr[byteIdx] >= byte(90) {
+			byteArr[byteIdx] += byte(7)
+		}
 	}
 	toMarshal := map[string]string{
 		"bitset": string(byteArr),
@@ -95,16 +108,24 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unpacks the string 1 or 0 to a set of sythetic boolean type
 func (bs *BitSet) UnmarshalJSON(data []byte) error {
-	bs.Set = make([]bool, len(bs.Set)*6)
-	for i, byt := range data {
-		bitOffset := i * 6
-		for j := 0; j < 6; j++ {
-			// iterate over the bits needing unpacked and-ing them against
-			//	the 2^j generated mask and checking if they are set
-			//	by comparing against 0
-			mask := byte(2 ^ j)
-			bs.Set[bitOffset+j] = (mask & byt) != byte(0)
+	bs.Set = []bool{}
+	for _, byt := range data {
+		bools := make([]bool, 6)
+		// work out the value from the character
+		// [42-60] +3 [63-90] +7 [97-?)
+		if byt >= byte(63) {
+			byt -= byte(3)
 		}
+		if byt >= byte(90) {
+			byt -= byte(7)
+		}
+		byt -= byte(42)
+		for j := 0; j < 6; j++ {
+			powMask := int(math.Pow(2.0, float64(j)))
+			masked := byt & byte(powMask)
+			bools[j] = masked != byte(0)
+		}
+		bs.Set = append(bs.Set, bools...)
 	}
 	return nil
 }

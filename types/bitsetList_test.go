@@ -135,7 +135,7 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 					true, true, true, true, true, true,
 				},
 			},
-			want:    []byte(`{"bitset":"_ow{}~"}`),
+			want:    []byte(`{"bitset":"Mdlprs"}`),
 			wantErr: false,
 		},
 	}
@@ -155,6 +155,55 @@ func TestBitSet_MarshalJSON(t *testing.T) {
 				// 	binaryStr += fmt.Sprintf("%08b\n", byt)
 				// }
 				t.Errorf("BitSet.MarshalJSON() = '%s', want '%v'", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBitSet_UnmarshalJSON(t *testing.T) {
+	type fields struct {
+		Set []bool
+	}
+	type args struct {
+		data []byte
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want []bool
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name:    "happy path",
+			fields:  fields{
+				Set: []bool{},
+			},
+			args:    args{
+				data: []byte("Mdlprs"),
+			},
+			want: []bool{
+				false, false, false, false, false, true,
+				false, false, false, false, true, true,
+				false, false, false, true, true, true,
+				false, false, true, true, true, true,
+				false, true, true, true, true, true,
+				true, true, true, true, true, true,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bs := &BitSet{
+				Set: tt.fields.Set,
+			}
+			if err := bs.UnmarshalJSON(tt.args.data); (err != nil) != tt.wantErr {
+				t.Errorf("BitSet.UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(bs.Set, tt.want) {
+				t.Errorf("BitSet.UnmarshalJSON() got = %v, want = %v", bs.Set, tt.want)
 			}
 		})
 	}

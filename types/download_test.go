@@ -2,7 +2,7 @@ package types
 
 import (
 	"os"
-	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -16,9 +16,9 @@ func TestDownloadLists(t *testing.T) {
 		{
 			name: "happy path",
 			wantPwLists: map[int]string{
-				1000:    "/home/ubuntu/passwordcritic/cache/1000.txt",
-				10_000:  "/home/ubuntu/passwordcritic/cache/10000.txt",
-				100_000: "/home/ubuntu/passwordcritic/cache/100000.txt",
+				1000:    "cache/1000.txt",
+				10_000:  "cache/10000.txt",
+				100_000: "cache/100000.txt",
 				// 1_000_000: "../cache/1000000.txt",
 			},
 			wantErr: false,
@@ -31,8 +31,14 @@ func TestDownloadLists(t *testing.T) {
 				t.Errorf("DownloadLists() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotPwLists, tt.wantPwLists) {
-				t.Errorf("DownloadLists() = %v, want %v", gotPwLists, tt.wantPwLists)
+			for num, suffix := range tt.wantPwLists{
+				if _, ok := gotPwLists[num]; !ok{
+					t.Errorf("couldn't find list with %d elems!", num)
+				}
+				if !strings.HasSuffix(gotPwLists[num], suffix) {
+					t.Errorf("got file path = %s did not contain prefix = %s", gotPwLists[num], tt.wantPwLists[num])
+				}
+				//t.Errorf("DownloadLists() = %v, want %v", gotPwLists, tt.wantPwLists)
 			}
 		})
 	}

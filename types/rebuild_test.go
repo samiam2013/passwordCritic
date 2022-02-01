@@ -85,7 +85,7 @@ func TestRebuildFilters(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.clearCache {
-				err = filepath.Walk(CacheFolderPath, deletePWFiles)
+				err = filepath.Walk(getCacheFolder(), deletePWFiles)
 				if err != nil {
 					t.Fatalf(err.Error())
 				}

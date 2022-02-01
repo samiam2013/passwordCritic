@@ -16,9 +16,9 @@ func TestDownloadLists(t *testing.T) {
 		{
 			name: "happy path",
 			wantPwLists: map[int]string{
-				1000:    "cache/1000.txt",
-				10_000:  "cache/10000.txt",
-				100_000: "cache/100000.txt",
+				1000:    getCacheFolder()+"1000.txt",
+				10_000:  getCacheFolder()+"10000.txt",
+				100_000: getCacheFolder()+"100000.txt",
 				// 1_000_000: "../cache/1000000.txt",
 			},
 			wantErr: false,

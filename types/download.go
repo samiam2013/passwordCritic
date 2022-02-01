@@ -24,7 +24,7 @@ func DownloadLists() (pwLists map[int]string, err error) {
 	for listSize, url := range pwLists {
 		//log.Print("downloading url: ", url)
 		newFilename := strconv.Itoa(listSize) + ".txt"
-		newFilePath := CacheFolderPath + string(os.PathSeparator) + newFilename
+		newFilePath := getCacheFolder() + newFilename
 
 		go dlConcurrent(newFilePath, url, waitChan)
 

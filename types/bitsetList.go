@@ -52,6 +52,20 @@ func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON defines custom interaction with BitSet.UnmarshalJSON
 func (bl *BitSetMap) UnmarshalJSON(data []byte) error {
+	var unmrshld map[string]map[string]map[int]string
+	err := json.Unmarshal(data, &unmrshld)
+	if err != nil {
+		return fmt.Errorf("BitsetMap.UnmarshalJSON() failed unmarshalling raw data to map: %s", err.Error())
+	}
+	for nElems, base64 := range unmrshld["list"]["bitset"] {
+		newBitSet := BitSet{}
+		err := newBitSet.UnmarshalJSON([]byte(base64))
+		if err != nil {
+			fmt.Errorf("failed unmarshalling bloom filter base64 into new bitset for BitSetMap.UnmarshallJSON: %s", err.Error())
+		}
+		bl.List[nElems] = newBitSet
+	}
+
 	return nil
 }
 
@@ -108,18 +122,27 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unpacks the string 1 or 0 to a set of sythetic boolean type
 func (bs *BitSet) UnmarshalJSON(data []byte) error {
+	// unmrshld := map[string]string{}
+	// err := json.Unmarshal(data, &unmrshld)
+	// if err != nil {
+	// 	return err
+	// }
+	// // TODO get 'bitset' string cost from struct through reflect?
+	// data = []byte(unmrshld["bitset"])
+
 	bs.Set = []bool{}
 	for _, byt := range data {
 		bools := make([]bool, 6)
 		// work out the value from the character
 		// [42-60] +3 [63-90] +7 [97-?)
-		if byt >= byte(63) {
-			byt -= byte(3)
-		}
 		if byt >= byte(90) {
 			byt -= byte(7)
 		}
+		if byt >= byte(63) {
+			byt -= byte(3)
+		}
 		byt -= byte(42)
+		// mask through each bit to assign the boolean
 		for j := 0; j < 6; j++ {
 			powMask := int(math.Pow(2.0, float64(j)))
 			masked := byt & byte(powMask)

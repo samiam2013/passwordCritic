@@ -171,17 +171,17 @@ func TestBitSet_UnmarshalJSON(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want []bool
+		want    []bool
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 		{
-			name:    "happy path",
-			fields:  fields{
+			name: "happy path",
+			fields: fields{
 				Set: []bool{},
 			},
-			args:    args{
-				data: []byte("Mdlprs"),
+			args: args{
+				data: []byte(`Mdlprs`),
 			},
 			want: []bool{
 				false, false, false, false, false, true,
@@ -204,6 +204,69 @@ func TestBitSet_UnmarshalJSON(t *testing.T) {
 			}
 			if !reflect.DeepEqual(bs.Set, tt.want) {
 				t.Errorf("BitSet.UnmarshalJSON() got = %v, want = %v", bs.Set, tt.want)
+			}
+		})
+	}
+}
+
+func TestBitSetMap_UnmarshalJSON(t *testing.T) {
+	type fields struct {
+		List map[int]BitSet
+	}
+	type args struct {
+		data []byte
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    BitSetMap
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "",
+			fields: fields{
+				List: map[int]BitSet{},
+			},
+			args: args{
+				data: []byte(`{"list":{"bitset":{"10":"Mdlprs","100":"rpldMs"}}}`),
+			},
+			want: BitSetMap{
+				List: map[int]BitSet{
+					10: {
+						Set: []bool{
+							false, false, false, false, false, true,
+							false, false, false, false, true, true,
+							false, false, false, true, true, true,
+							false, false, true, true, true, true,
+							false, true, true, true, true, true,
+							true, true, true, true, true, true},
+					},
+					100: {
+						Set: []bool{
+							false, true, true, true, true, true,
+							false, false, true, true, true, true,
+							false, false, false, true, true, true,
+							false, false, false, false, true, true,
+							false, false, false, false, false, true,
+							true, true, true, true, true, true},
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bl := &BitSetMap{
+				List: tt.fields.List,
+			}
+			if err := bl.UnmarshalJSON(tt.args.data); (err != nil) != tt.wantErr {
+				t.Errorf("BitSetMap.UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(bl.List, tt.want.List) {
+				t.Errorf("BitSetMap.UnmarshalJSON() got = %v, want = %v", bl.List, tt.want.List)
 			}
 		})
 	}

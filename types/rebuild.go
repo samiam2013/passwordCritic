@@ -8,7 +8,7 @@ import (
 )
 
 // CacheFolderPath keeps a single reference to password list directory
-const CacheFolderPath = "../cache"
+const CacheFolderPath = "/home/ubuntu/passwordcritic/cache"
 
 // DefaultBitsetFile determines what file the pre-compiled filter exists or gets rebuilt
 const DefaultBitsetFile = CacheFolderPath + "/defaultFilter.json"

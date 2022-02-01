@@ -8,7 +8,7 @@ import (
 // TestEntropy _
 func TestEntropy(t *testing.T) {
 	cases := map[string]float32{
-		"aaaaaa":                               0.0,
+		"aaaaaa":                               -1.0,
 		"password":                             2.75,
 		"p455W0rD!":                            2.947703,
 		"correcthorsebatterystaple":            3.363856,

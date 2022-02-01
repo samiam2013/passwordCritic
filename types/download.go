@@ -22,7 +22,7 @@ func DownloadLists() (pwLists map[int]string, err error) {
 	waitChan := make(chan bool, len(pwLists))
 
 	for listSize, url := range pwLists {
-		log.Print("downloading url: ", url)
+		//log.Print("downloading url: ", url)
 		newFilename := strconv.Itoa(listSize) + ".txt"
 		newFilePath := CacheFolderPath + string(os.PathSeparator) + newFilename
 
@@ -32,7 +32,8 @@ func DownloadLists() (pwLists map[int]string, err error) {
 	}
 
 	for i := 0; i < len(pwLists); i++ {
-		log.Printf("finished? %v", <-waitChan)
+		//log.Printf("finished? %v", <-waitChan)
+		_ = <-waitChan // TODO is this right?
 	}
 
 	return

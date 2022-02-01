@@ -1,9 +1,8 @@
 package critic
 
 import (
-	"errors"
+	"fmt"
 	"math"
-	"strconv"
 
 	"github.com/samiam2013/passwordcritic/types"
 )
@@ -24,9 +23,9 @@ const MinLength = 8
 // Entropy returns a float32 calculated using variety and frequency of characters
 func (p *PassCandidate) Entropy() (float32, error) {
 	if len(p.StringVal) < MinLength {
-		err := errors.New("password too short, minimum" +
-			strconv.Itoa(MinLength) + "characters")
-		return 0.0, err
+		err := fmt.Errorf("password too short, minimum %d characters", MinLength)
+		p.H = -1.0
+		return p.H, err
 	}
 	occurrences := charOccurrences(p.StringVal)
 	p.Cardinality = len(occurrences)

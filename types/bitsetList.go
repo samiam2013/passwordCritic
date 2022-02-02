@@ -61,7 +61,7 @@ func (bl *BitSetMap) UnmarshalJSON(data []byte) error {
 		newBitSet := BitSet{}
 		err := newBitSet.UnmarshalJSON([]byte(base64))
 		if err != nil {
-			fmt.Errorf("failed unmarshalling bloom filter base64 into new bitset for BitSetMap.UnmarshallJSON: %s", err.Error())
+			return fmt.Errorf("failed unmarshalling bloom filter base64 into new bitset for BitSetMap.UnmarshallJSON: %s", err.Error())
 		}
 		bl.List[nElems] = newBitSet
 	}

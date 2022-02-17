@@ -24,7 +24,8 @@ Entropy of the password candidate:  3.2776136
 ```
 
 ## TODO:
-- [] test frequency of false positives for a given BloomFilter.bitSet size
-- [] benchmark algorithms used by bloom filter for hashing 
+
+- [ ] test frequency of false positives for a given BloomFilter.bitSet size
+- [ ] benchmark algorithms used by bloom filter for hashing 
 - [x] serialize the filter to something more efficient than the 0|1 mapped JSON
-- [] add a backup source for commmon password lists
+- [ ] add a backup source for commmon password lists

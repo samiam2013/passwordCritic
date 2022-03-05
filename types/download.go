@@ -1,70 +1,39 @@
 package types
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 // DownloadLists encapsulates code for downloading common password list(s) and provides a returned list of the sizes and paths to downloaded files
-func DownloadLists() (pwLists map[int]string, err error) {
-	const dmCommonFolderURL string = "https://raw.githubusercontent.com/danielmiessler/SecLists/" +
-		"aa0eb72f3871b01372596a34fb5378910df50073/Passwords/Common-Credentials/"
-	pwLists = map[int]string{
-		// 1_000_000: dmCommonFolderURL + "10-million-password-list-top-1000000.txt",
-		100_000: dmCommonFolderURL + "10-million-password-list-top-100000.txt",
-		10_000:  dmCommonFolderURL + "10-million-password-list-top-10000.txt",
-		1000:    dmCommonFolderURL + "10-million-password-list-top-1000.txt",
-	}
+func DownloadLists() (map[int]string, error) {
 
-	waitChan := make(chan bool, len(pwLists))
+	// need to download from my repository's file in binary formate (!! at a permalink !!)
+	// 	trying github first with a HEAD request, then downloading
+	//	failing over to gitlab ... or panic
+	// need to slice the file n times for (k, k*10 .. k *10^n) sizes
+	//	and save files with names like 1000.txt, 10000.txt
 
-	for listSize, url := range pwLists {
-		//log.Print("downloading url: ", url)
-		newFilename := strconv.Itoa(listSize) + ".txt"
-		newFilePath := getCacheFolder() + newFilename
-
-		go dlConcurrent(newFilePath, url, waitChan)
-
-		pwLists[listSize] = newFilePath
-	}
-
-	for i := 0; i < len(pwLists); i++ {
-		//log.Printf("finished? %v", <-waitChan)
-		_ = <-waitChan // TODO is this right?
-	}
-
-	return
+	return map[int]string{}, fmt.Errorf("not implemented")
 }
 
-func dlConcurrent(filepath, url string, finished chan bool) {
-	_, err := dlFileTo(filepath, url)
+func dlFileTo(filepath, url string) (int64, error) {
+
+	out, err := os.Create(filepath)
 	if err != nil {
-		log.Print("could not download file: " + err.Error())
-		finished <- false
-	}
-
-	defer func() {
-		finished <- true
-	}()
-}
-
-func dlFileTo(filepath, url string) (written int64, err error) {
-	var out *os.File
-	if out, err = os.Create(filepath); err != nil {
-		return
+		return 0, err
 	}
 	defer out.Close()
 
-	var resp *http.Response
-	if resp, err = http.Get(url); err != nil {
-		return
+	resp, err := http.Get(url)
+	if err != nil {
+		return 0, err
 	}
 	defer resp.Body.Close()
 
-	written, err = io.Copy(out, resp.Body)
+	written, err := io.Copy(out, resp.Body)
 
-	return
+	return written, err
 }

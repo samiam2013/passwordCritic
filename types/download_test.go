@@ -16,9 +16,9 @@ func TestDownloadLists(t *testing.T) {
 		{
 			name: "happy path",
 			wantPwLists: map[int]string{
-				1000:    getCacheFolder()+"1000.txt",
-				10_000:  getCacheFolder()+"10000.txt",
-				100_000: getCacheFolder()+"100000.txt",
+				1000:    getCacheFolder() + "1000.txt",
+				10_000:  getCacheFolder() + "10000.txt",
+				100_000: getCacheFolder() + "100000.txt",
 				// 1_000_000: "../cache/1000000.txt",
 			},
 			wantErr: false,
@@ -31,8 +31,8 @@ func TestDownloadLists(t *testing.T) {
 				t.Errorf("DownloadLists() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			for num, suffix := range tt.wantPwLists{
-				if _, ok := gotPwLists[num]; !ok{
+			for num, suffix := range tt.wantPwLists {
+				if _, ok := gotPwLists[num]; !ok {
 					t.Errorf("couldn't find list with %d elems!", num)
 				}
 				if !strings.HasSuffix(gotPwLists[num], suffix) {

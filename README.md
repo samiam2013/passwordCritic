@@ -1,4 +1,4 @@
-# Password Critic [![codecov](https://codecov.io/gh/samiam2013/passwordCritic/branch/main/graph/badge.svg?token=GDEPYIjlBw)](https://codecov.io/gh/samiam2013/passwordCritic) [![Build Status](https://app.travis-ci.com/samiam2013/passwordCritic.svg?branch=main)](https://app.travis-ci.com/samiam2013/passwordCritic) [![Go Report Card](https://goreportcard.com/badge/github.com/samiam2013/passwordcritic)](https://goreportcard.com/report/github.com/samiam2013/passwordcritic) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+# Password Critic [![codecov](https://codecov.io/gh/samiam2013/passwordCritic/branch/main/graph/badge.svg?token=GDEPYIjlBw)](https://codecov.io/gh/samiam2013/passwordCritic) [![Go Report Card](https://goreportcard.com/badge/github.com/samiam2013/passwordcritic)](https://goreportcard.com/report/github.com/samiam2013/passwordcritic) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 
 ###  github.com/samiam2013/passwordCritic

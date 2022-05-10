@@ -1,18 +1,19 @@
 package critic
 
 import (
+	"math"
 	"strings"
 	"testing"
 )
 
 // TestEntropy _
 func TestEntropy(t *testing.T) {
-	cases := map[string]float32{
+	cases := map[string]float64{
 		"aaaaaa":                               -1.0,
 		"password":                             2.75,
-		"p455W0rD!":                            2.947703,
-		"correcthorsebatterystaple":            3.363856,
-		"thequickbrownfoxjumpedoverthelazydog": 4.447703,
+		"p455W0rD!":                            2.947,
+		"correcthorsebatterystaple":            3.363,
+		"thequickbrownfoxjumpedoverthelazydog": 4.447,
 	}
 
 	// create an instance for use of .Entropy()
@@ -37,8 +38,13 @@ func TestEntropy(t *testing.T) {
 				t.Errorf("case '%s' expected no error, got '%s'", pwCase, err.Error())
 			}
 		}
-		if entropy != hExpected {
+		if !withinThousandth(entropy, hExpected) {
 			t.Errorf("case '%s' expected entropy %+v; got %+v", pwCase, hExpected, entropy)
 		}
 	}
+}
+
+// withinThousandth checks if a is within 0.001 of b
+func withinThousandth(a, b float64) bool {
+	return math.Abs(a-b) < 0.001
 }

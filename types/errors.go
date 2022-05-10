@@ -9,7 +9,7 @@ import (
 // HomogeneityError creates a switchable type of error for low entropy
 type HomogeneityError struct {
 	Cardinality       int
-	LowestProbability float32
+	LowestProbability float64
 }
 
 func (h *HomogeneityError) Error() string {

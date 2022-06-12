@@ -92,7 +92,8 @@ func checkEntropy(pwCandPtr *string) (candidate critic.PassCandidate, err error)
 	candidate = critic.PassCandidate{}
 	candidate.StringVal = *pwCandPtr
 	h, err := candidate.Entropy()
-	fmt.Println("Entropy of the password candidate: ", h)
+	// fmt.Println("Entropy of the password candidate: ", h)
+	fmt.Printf("Entropy of the password candidate: %f\n", h)
 	if err != nil {
 		if _, ok := err.(*types.HomogeneityError); !ok {
 			err = fmt.Errorf("non 'homogeneity' type error encounter checking entropy"+

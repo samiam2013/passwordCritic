@@ -13,5 +13,5 @@ coverage.txt
 # not this dummy file generated while testing the download function
 cache/test*.json
 
-# don't save this binary
-**/cmd
+# not this binary
+cmd/cmd

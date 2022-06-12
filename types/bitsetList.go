@@ -84,7 +84,7 @@ func (bs *BitSet) MarshalJSON() ([]byte, error) {
 		bs.Set = append(bs.Set, make([]bool, bitRemainder)...)
 	}
 	noBytes := bitLen / 6
-	fmt.Printf("number of bytes to marshall: %d", noBytes)
+	fmt.Printf("number of bytes to marshall: %d\n", noBytes)
 	byteArr := make([]byte, noBytes)
 	for byteIdx := 0; byteIdx < noBytes; byteIdx++ {
 		for bit := 0; bit < 6; bit++ {

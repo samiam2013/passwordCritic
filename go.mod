@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/spaolacci/murmur3 v1.1.0
-	github.com/stretchr/testify v1.7.4
+	github.com/stretchr/testify v1.8.0
 )
 
 require (

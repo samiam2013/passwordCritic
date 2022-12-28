@@ -13,12 +13,25 @@ const CacheFolder = "cache" + string(os.PathSeparator)
 // DefaultBitsetFilename determines what file the pre-compiled filter exists or gets rebuilt
 const DefaultBitsetFilename = "defaultFilter.json"
 
-func getList() map[int]string {
+type Rarity int
+
+const (
+	Ten             Rarity = 10
+	Hundred         Rarity = 100
+	Thousand        Rarity = 1_000
+	TenThousand     Rarity = 10_000
+	HundredThousand Rarity = 100_000
+	// Million         Rarity = 1_000_000
+	// Default
+	_ Rarity = 1_000
+)
+
+func getList() map[Rarity]string {
 	CacheFolderPath := getCacheFolder()
-	return map[int]string{
-		1_000:   CacheFolderPath + "1000.txt",
-		10_000:  CacheFolderPath + "10000.txt",
-		100_000: CacheFolderPath + "100000.txt",
+	return map[Rarity]string{
+		Thousand:        CacheFolderPath + "1000.txt",
+		TenThousand:     CacheFolderPath + "10000.txt",
+		HundredThousand: CacheFolderPath + "100000.txt",
 		// 1_000_000: CacheFolderPath + "1000000.txt",
 	}
 }
@@ -33,10 +46,10 @@ func getCacheFolder() string {
 }
 
 // RebuildFilters looks at the default filter paths and rebuilds the Bloomfilters
-func RebuildFilters() (map[int]BloomFilter, error) {
-	filters := make(map[int]BloomFilter)
-	for count, filepath := range getList() {
-		bitsNeeded := int(float32(count) * 12.364167) // only works for 3 hash functions
+func RebuildFilters() (map[Rarity]BloomFilter, error) {
+	filters := make(map[Rarity]BloomFilter)
+	for countRarity, filepath := range getList() {
+		bitsNeeded := int(float32(countRarity) * 12.364167) // only works for 3 hash functions
 
 		fh, err := os.Open(filepath)
 		if err != nil {
@@ -49,11 +62,11 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 			return nil, fmt.Errorf("error building filter for file '%s': %s",
 				fh.Name(), err.Error())
 		}
-		filters[count] = *newFilter
+		filters[countRarity] = *newFilter
 	}
 
 	bitset := BitSetMap{
-		List: make(map[int]BitSet),
+		List: make(map[Rarity]BitSet),
 	}
 	for elems, filter := range filters {
 		bitset.addFilter(elems, filter)
@@ -67,9 +80,9 @@ func RebuildFilters() (map[int]BloomFilter, error) {
 }
 
 // LoadFilters loads the BloomFilters from the Default BitsetFile location
-func LoadFilters() (filters map[int]BloomFilter, err error) {
+func LoadFilters() (filters map[Rarity]BloomFilter, err error) {
 	bitset := BitSetMap{
-		List: make(map[int]BitSet),
+		List: make(map[Rarity]BitSet),
 	}
 	filters, err = bitset.LoadFromFile(getCacheFolder() + DefaultBitsetFilename)
 	if err != nil {

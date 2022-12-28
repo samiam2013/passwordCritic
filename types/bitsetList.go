@@ -11,14 +11,14 @@ import (
 // BitSetMap holds lists of the built filters for json storage/loading
 type BitSetMap struct {
 	// map of the bitsets indexed by # of elements (pws) in the filter
-	List map[int]BitSet `json:"list"`
+	List map[Rarity]BitSet `json:"list"`
 }
 
 // The struct above creates dependency for example List needs to be index 0
 
 // MarshalJSON overrides the interface{} marshalling behavior or BitsetMap
 func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
-	list := make(map[int]string, len(bl.List))
+	list := make(map[Rarity]string, len(bl.List))
 	for nElem, bitSet := range bl.List {
 		bytes, err := bitSet.MarshalJSON()
 		if err != nil {
@@ -39,7 +39,7 @@ func (bl *BitSetMap) MarshalJSON() ([]byte, error) {
 	}
 
 	toMarshal := map[string]interface{}{
-		tag: map[string]map[int]string{
+		tag: map[string]map[Rarity]string{
 			"bitset": list,
 		},
 	}
@@ -63,7 +63,7 @@ func (bl *BitSetMap) UnmarshalJSON(data []byte) error {
 		if err != nil {
 			return fmt.Errorf("failed unmarshalling bloom filter base64 into new bitset for BitSetMap.UnmarshallJSON: %s", err.Error())
 		}
-		bl.List[nElems] = newBitSet
+		bl.List[Rarity(nElems)] = newBitSet
 	}
 
 	return nil
@@ -154,7 +154,7 @@ func (bs *BitSet) UnmarshalJSON(data []byte) error {
 }
 
 // LoadFromRebuild takes in the map from LoadFromFile or DownloadLists and puts the filters into the BitSetMap
-func (bl *BitSetMap) LoadFromRebuild(filters map[int]BloomFilter) error {
+func (bl *BitSetMap) LoadFromRebuild(filters map[Rarity]BloomFilter) error {
 	for elems, bFilter := range filters {
 		err := bl.addFilter(elems, bFilter)
 		if err != nil {
@@ -164,7 +164,7 @@ func (bl *BitSetMap) LoadFromRebuild(filters map[int]BloomFilter) error {
 	return nil
 }
 
-func (bl *BitSetMap) addFilter(elems int, b BloomFilter) error {
+func (bl *BitSetMap) addFilter(elems Rarity, b BloomFilter) error {
 	if _, ok := bl.List[elems]; ok {
 		return fmt.Errorf("key (# passwords) '%d' already set", elems)
 	}
@@ -178,8 +178,8 @@ func (bl *BitSetMap) addFilter(elems int, b BloomFilter) error {
 	return nil
 }
 
-func (bl *BitSetMap) getFilters() (list map[int]BloomFilter) {
-	list = make(map[int]BloomFilter)
+func (bl *BitSetMap) getFilters() (list map[Rarity]BloomFilter) {
+	list = make(map[Rarity]BloomFilter)
 	for elems, Bits := range bl.List {
 		newFilter := *NewBloom(len(Bits.Set))
 		for i, bit := range Bits.Set {
@@ -209,7 +209,7 @@ func (bl *BitSetMap) WriteToFile(pathToFile string) error {
 }
 
 // LoadFromFile reads in the BitSetMap stored in JSON by BitSetMap.WriteToFile()
-func (bl *BitSetMap) LoadFromFile(pathToFile string) (list map[int]BloomFilter, err error) {
+func (bl *BitSetMap) LoadFromFile(pathToFile string) (list map[Rarity]BloomFilter, err error) {
 	fileBytes, err := os.ReadFile(pathToFile)
 	if err != nil {
 		return

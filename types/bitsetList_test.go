@@ -7,7 +7,7 @@ import (
 )
 
 // global filters for testing
-var list map[int]BloomFilter
+var list map[Rarity]BloomFilter
 
 func Init() {
 	var err error
@@ -19,10 +19,10 @@ func Init() {
 
 func TestBitSetMap_LoadFromRebuild(t *testing.T) {
 	type fields struct {
-		List map[int]BitSet
+		List map[Rarity]BitSet
 	}
 	type args struct {
-		filters map[int]BloomFilter
+		filters map[Rarity]BloomFilter
 	}
 
 	tests := []struct {
@@ -35,7 +35,7 @@ func TestBitSetMap_LoadFromRebuild(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int]BitSet{},
+				List: map[Rarity]BitSet{},
 			},
 			args: args{
 				filters: list,
@@ -57,7 +57,7 @@ func TestBitSetMap_LoadFromRebuild(t *testing.T) {
 
 func TestBitSetMap_WriteToFile(t *testing.T) {
 	type fields struct {
-		List map[int]BitSet
+		List map[Rarity]BitSet
 	}
 	type args struct {
 		pathToFile string
@@ -72,7 +72,7 @@ func TestBitSetMap_WriteToFile(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				List: map[int]BitSet{
+				List: map[Rarity]BitSet{
 					10: {
 						Set: []bool{
 							false, false, false, false, false, true,
@@ -211,7 +211,7 @@ func TestBitSet_UnmarshalJSON(t *testing.T) {
 
 func TestBitSetMap_UnmarshalJSON(t *testing.T) {
 	type fields struct {
-		List map[int]BitSet
+		List map[Rarity]BitSet
 	}
 	type args struct {
 		data []byte
@@ -227,13 +227,13 @@ func TestBitSetMap_UnmarshalJSON(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				List: map[int]BitSet{},
+				List: map[Rarity]BitSet{},
 			},
 			args: args{
 				data: []byte(`{"list":{"bitset":{"10":"Mdlprs","100":"rpldMs"}}}`),
 			},
 			want: BitSetMap{
-				List: map[int]BitSet{
+				List: map[Rarity]BitSet{
 					10: {
 						Set: []bool{
 							false, false, false, false, false, true,

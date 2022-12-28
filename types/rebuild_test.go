@@ -101,7 +101,7 @@ func TestRebuildFilters(t *testing.T) {
 				t.Errorf("RebuildFilters() = %v, want %v", nFitlersGot, tt.nFilters)
 			}
 			for i, filter := range gotten {
-				assert.Equal(t, len(filter.GetBitset()), tt.filterLens[i])
+				assert.Equal(t, len(filter.GetBitset()), tt.filterLens[int(i)])
 			}
 
 			if tt.clearCache {
